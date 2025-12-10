@@ -3,7 +3,7 @@ import { Download, X, Home, ExternalLink, Zap, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProgressBar from "./ProgressBar";
 import { toast } from "sonner";
-import { getDownloadUrl, getStreamUrl } from "../data/mockMovies";
+import { getDownloadUrl } from "../data/mockMovies";
 import { useNavigate } from "react-router-dom";
 
 interface DownloadSectionProps {
