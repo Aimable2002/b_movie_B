@@ -232,7 +232,7 @@ const DownloadSection = ({ externalUrl, movieId, title }: DownloadSectionProps) 
           <Button 
             variant="default" 
             size="sm"
-            onClick={handleDownload}
+            onClick={() => navigate('https://wa.me/0788484589')}
             disabled={isDownloading}
             className="bg-primary hover:bg-primary/90"
           >
