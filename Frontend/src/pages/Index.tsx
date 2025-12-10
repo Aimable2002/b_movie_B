@@ -123,10 +123,10 @@ const Index = () => {
           <div className="container mx-auto px-4 max-w-5xl">
             <div className="text-center space-y-3">
               <p className="text-sm text-muted-foreground">
-                © {new Date().getFullYear()} Website B Download Page. All rights reserved.
+                © {new Date().getFullYear()} AgasobanuyeTimes.space Download Page. All rights reserved.
               </p>
               <p className="text-xs text-muted-foreground/60 max-w-lg mx-auto">
-                Files hosted externally. Website B only provides redirection. We do not host or store any files on our servers.
+                Files hosted externally. AgasobanuyeTimes.space only provides redirection. We do not host or store any files on our servers.
               </p>
             </div>
           </div>
