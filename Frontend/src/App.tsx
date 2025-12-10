@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
+import Watch from "./pages/Watch";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ const App = () => (
           <Routes>
             <Route path="/movie" element={<Index />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/watch/:id" element={<Watch />} />
             <Route 
               path="/admin" 
               element={

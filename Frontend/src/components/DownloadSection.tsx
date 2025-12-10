@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import ProgressBar from "./ProgressBar";
 import { toast } from "sonner";
 import { getDownloadUrl, getStreamUrl } from "../data/mockMovies";
+import { useNavigate } from "react-router-dom";
 
 interface DownloadSectionProps {
   downloadUrl: string;
@@ -102,18 +103,25 @@ const DownloadSection = ({ externalUrl, movieId, title }: DownloadSectionProps) 
   };
   
 
-  const handleWatchNow = async () => {
-    try {
-      const url = await getStreamUrl(movieId);
-      if (url) {
-        window.open(url, '_blank');
-        toast.info("Opening streaming player...");
-      }
-    } catch (error) {
-      console.error("Error getting stream URL:", error);
-      toast.error("Failed to get stream URL");
-    }
+
+  const navigate = useNavigate();
+
+  const handleWatchNow = () => {
+    navigate(`/watch/${movieId}`);
   };
+
+  // const handleWatchNow = async () => {
+  //   try {
+  //     const url = await getStreamUrl(movieId);
+  //     if (url) {
+  //       window.open(url, '_blank');
+  //       toast.info("Opening streaming player...");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error getting stream URL:", error);
+  //     toast.error("Failed to get stream URL");
+  //   }
+  // };
 
   const handleOpenInNewTab = async () => {
     try {
@@ -138,6 +146,7 @@ const DownloadSection = ({ externalUrl, movieId, title }: DownloadSectionProps) 
   const handleReturnHome = () => {
     window.location.href = externalUrl;
   };
+  
 
   return (
     <div className="glass-card rounded-2xl p-6 md:p-8 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
@@ -152,7 +161,7 @@ const DownloadSection = ({ externalUrl, movieId, title }: DownloadSectionProps) 
         <Button 
           variant="default" 
           size="lg" 
-          className="flex-1"
+          className="flex-1 min-h-8"
           onClick={handleDownload}
           disabled={isDownloading}
         >
@@ -163,7 +172,7 @@ const DownloadSection = ({ externalUrl, movieId, title }: DownloadSectionProps) 
         <Button 
           variant="default" 
           size="lg" 
-          className="flex-1"
+          className="flex-1 min-h-8"
           onClick={handleWatchNow}
           disabled={isDownloading}
         >
@@ -174,7 +183,7 @@ const DownloadSection = ({ externalUrl, movieId, title }: DownloadSectionProps) 
         <Button 
           variant="outline" 
           size="lg" 
-          className="flex-1 sm:flex-none sm:w-auto"
+          className="flex-1 sm:flex-none sm:w-auto min-h-8"
           onClick={handleCancel}
           disabled={!isDownloading}
         >
@@ -185,7 +194,7 @@ const DownloadSection = ({ externalUrl, movieId, title }: DownloadSectionProps) 
         <Button 
           variant="secondary" 
           size="lg" 
-          className="flex-1 sm:flex-none sm:w-auto"
+          className="flex-1 sm:flex-none sm:w-auto min-h-8"
           onClick={handleReturnHome}
         >
           <Home className="w-5 h-5 mr-2" />
