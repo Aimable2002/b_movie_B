@@ -1,10 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { getMovies, addMovie, updateMovie, deleteMovie, type Movie } from "../data/mockMovies";
+import { getMovies, addMovie, updateMovie, deleteMovie, type Movie, 
+  getSeries, addSeries, deleteSeries, type Series
+} from "../data/mockMovies";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input"; 
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Table, 
   TableBody, 
@@ -20,23 +24,28 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, LogOut, Film, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, LogOut, Film, Loader2, Tv } from "lucide-react";
 import { toast } from "sonner";
 
 const Admin = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const [movies, setMovies] = useState<Movie[]>([]);
+  const [seriesList, setSeriesList] = useState<Series[]>([]);
+  const [isSeriesLoading, setIsSeriesLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingMovie, setEditingMovie] = useState<Movie | null>(null);
+  const [contentType, setContentType] = useState<"movie" | "series">("movie");
   const [formData, setFormData] = useState({
     title: "",
     downloadUrl: "",
     streamUrl: "",
     externalUrl: "",
-    fileSize: ""
+    fileSize: "",
+    seasonName: "",
+    episodeName: ""
   });
 
   // Fetch movies on component mount
@@ -57,6 +66,19 @@ const Admin = () => {
     }
   };
 
+  const fetchSeries = async () => {
+    setIsSeriesLoading(true);
+    try {
+      const data = await getSeries();
+      setSeriesList(data);
+    } catch (error) {
+      console.error("Error fetching series:", error);
+      toast.error("Failed to load series");
+    } finally {
+      setIsSeriesLoading(false);
+    }
+  };
+
   const handleLogout = () => {
     logout();
     navigate("/login");
@@ -68,7 +90,9 @@ const Admin = () => {
       downloadUrl: "",
       streamUrl: "",
       externalUrl: "",
-      fileSize: ""
+      fileSize: "",
+      seasonName: "",
+      episodeName: ""
     });
     setEditingMovie(null);
   };
@@ -81,7 +105,9 @@ const Admin = () => {
         downloadUrl: movie.downloadUrl,
         streamUrl: movie.streamUrl,
         externalUrl: movie.externalUrl,
-        fileSize: movie.fileSize
+        fileSize: movie.fileSize,
+        seasonName: "",
+        episodeName: ""
       });
     } else {
       resetForm();
@@ -94,26 +120,40 @@ const Admin = () => {
     setIsSubmitting(true);
 
     try {
-      if (editingMovie) {
-        await updateMovie(editingMovie._id, {
+      if (contentType == 'movie'){
+        if (editingMovie) {
+          await updateMovie(editingMovie._id, {
+            title: formData.title,
+            downloadUrl: formData.downloadUrl,
+            streamUrl: formData.streamUrl,
+            externalUrl: formData.externalUrl
+          });
+          toast.success("Movie updated successfully");
+        } else {
+          await addMovie({
+            title: formData.title,
+            downloadUrl: formData.downloadUrl,
+            streamUrl: formData.streamUrl,
+            externalUrl: formData.externalUrl,
+            fileSize: formData.fileSize
+          });
+          toast.success("Movie added successfully");
+        }
+        await fetchMovies();
+      }else {
+        await addSeries({
           title: formData.title,
-          downloadUrl: formData.downloadUrl,
-          streamUrl: formData.streamUrl,
-          externalUrl: formData.externalUrl
-        });
-        toast.success("Movie updated successfully");
-      } else {
-        await addMovie({
-          title: formData.title,
-          downloadUrl: formData.downloadUrl,
-          streamUrl: formData.streamUrl,
           externalUrl: formData.externalUrl,
+          seasonName: formData.seasonName,
+          episodeName: formData.episodeName,
+          downloadUrl: formData.downloadUrl,
+          streamUrl: formData.streamUrl,
           fileSize: formData.fileSize
         });
-        toast.success("Movie added successfully");
+        toast.success("Series episode added successfully");
+        await fetchSeries();
       }
-      
-      await fetchMovies();
+    
       setIsDialogOpen(false);
       resetForm();
     } catch (error: any) {
@@ -140,6 +180,25 @@ const Admin = () => {
     } catch (error) {
       console.error("Error deleting movie:", error);
       toast.error("Failed to delete movie");
+    }
+  };
+
+  const handleDeleteSeries = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this series?")) {
+      return;
+    }
+
+    try {
+      const success = await deleteSeries(id);
+      if (success) {
+        toast.success("Series deleted successfully");
+        await fetchSeries();
+      } else {
+        toast.error("Failed to delete series");
+      }
+    } catch (error) {
+      console.error("Error deleting series:", error);
+      toast.error("Failed to delete series");
     }
   };
 
@@ -176,24 +235,70 @@ const Admin = () => {
                 <DialogTrigger asChild>
                   <Button onClick={() => handleOpenDialog()}>
                     <Plus className="w-4 h-4 mr-2" />
-                    Add Movie
+                    Add Movies
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-lg">
+                <DialogContent className="sm:max-w-lg max-h-[80vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>{editingMovie ? "Edit Movie" : "Add New Movie"}</DialogTitle>
                   </DialogHeader>
                   <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="title">Title</Label>
-                      <Input
-                        id="title"
-                        value={formData.title}
-                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                        placeholder="Movie title"
-                        required
-                      />
-                    </div>
+                    {!editingMovie && (
+                        <div className="space-y-2">
+                          <Label>Content Type</Label>
+                          <RadioGroup 
+                            value={contentType} 
+                            onValueChange={(value) => setContentType(value as "movie" | "series")}
+                            className="flex gap-4"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="movie" id="movie" />
+                              <Label htmlFor="movie" className="cursor-pointer">Movie</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="series" id="series" />
+                              <Label htmlFor="series" className="cursor-pointer">Series</Label>
+                            </div>
+                          </RadioGroup>
+                        </div>
+                      )}
+
+                      <div className="space-y-2">
+                        <Label htmlFor="title">Title</Label>
+                        <Input
+                          id="title"
+                          value={formData.title}
+                          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                          placeholder="Movie title"
+                          required
+                        />
+                      </div>
+
+                      {contentType === "series" && !editingMovie && (
+                        <>
+                          <div className="space-y-2">
+                            <Label htmlFor="seasonName">Season Name</Label>
+                            <Input
+                              id="seasonName"
+                              value={formData.seasonName}
+                              onChange={(e) => setFormData({ ...formData, seasonName: e.target.value })}
+                              placeholder="Season 1"
+                              required
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="episodeName">Episode Name</Label>
+                            <Input
+                              id="episodeName"
+                              value={formData.episodeName}
+                              onChange={(e) => setFormData({ ...formData, episodeName: e.target.value })}
+                              placeholder="Episode 1"
+                              required
+                            />
+                          </div>
+                        </>
+                      )}
+
                     <div className="space-y-2">
                       <Label htmlFor="downloadUrl">Download URL</Label>
                       <Input
@@ -253,7 +358,7 @@ const Admin = () => {
                             {editingMovie ? "Updating..." : "Adding..."}
                           </>
                         ) : (
-                          `${editingMovie ? "Update" : "Add"} Movie`
+                          `${editingMovie ? "Update" : "Add"} ${contentType == 'movie' ? 'Movie' : 'Serie'}`
                         )}
                       </Button>
                     </div>
@@ -262,66 +367,141 @@ const Admin = () => {
               </Dialog>
             </div>
 
-            {isLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Title</TableHead>
-                      <TableHead>File Size</TableHead>
-                      <TableHead>External URL</TableHead>
-                      <TableHead>Created At</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {movies.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                          No movies found. Add your first movie!
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      movies.map((movie) => (
-                        <TableRow key={movie._id}>
-                          <TableCell className="font-medium">{movie.title}</TableCell>
-                          <TableCell>{movie.fileSize}</TableCell>
-                          <TableCell className="max-w-xs truncate">{movie.externalUrl}</TableCell>
-                          <TableCell>
-                            {movie.createdAt 
-                              ? new Date(movie.createdAt).toLocaleDateString()
-                              : "-"
-                            }
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex gap-2 justify-end">
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => handleOpenDialog(movie)}
-                              >
-                                <Pencil className="w-4 h-4" />
-                              </Button>
-                              <Button 
-                                variant="destructive" 
-                                size="sm"
-                                onClick={() => handleDelete(movie._id)}
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
+            <Tabs defaultValue="movies" className="w-full">
+              <TabsList className="mb-4">
+                <TabsTrigger value="movies" className="flex items-center gap-2">
+                  <Film className="w-4 h-4" />
+                  Movies
+                </TabsTrigger>
+                <TabsTrigger value="series" className="flex items-center gap-2">
+                  <Tv className="w-4 h-4" />
+                  Series
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="movies">
+                {isLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Title</TableHead>
+                          <TableHead>File Size</TableHead>
+                          <TableHead>External URL</TableHead>
+                          <TableHead>Created At</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
+                      </TableHeader>
+                      <TableBody>
+                        {movies.length === 0 ? (
+                          <TableRow>
+                            <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                              No movies found. Add your first movie!
+                            </TableCell>
+                          </TableRow>
+                        ) : (
+                          movies.map((movie) => (
+                            <TableRow key={movie._id}>
+                              <TableCell className="font-medium">{movie.title}</TableCell>
+                              <TableCell>{movie.fileSize}</TableCell>
+                              <TableCell className="max-w-xs truncate">{movie.externalUrl}</TableCell>
+                              <TableCell>
+                                {movie.createdAt 
+                                  ? new Date(movie.createdAt).toLocaleDateString()
+                                  : "-"
+                                }
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <div className="flex gap-2 justify-end">
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm"
+                                    onClick={() => handleOpenDialog(movie)}
+                                  >
+                                    <Pencil className="w-4 h-4" />
+                                  </Button>
+                                  <Button 
+                                    variant="destructive" 
+                                    size="sm"
+                                    onClick={() => handleDelete(movie._id)}
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </TabsContent>
+
+              <TabsContent value="series">
+                {isSeriesLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Title</TableHead>
+                          <TableHead>Season</TableHead>
+                          <TableHead>Episode</TableHead>
+                          <TableHead>File Size</TableHead>
+                          <TableHead>External URL</TableHead>
+                          <TableHead>Created At</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {seriesList.length === 0 ? (
+                          <TableRow>
+                            <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                              No series found. Add your first series!
+                            </TableCell>
+                          </TableRow>
+                        ) : (
+                          seriesList.map((s) => (
+                            <TableRow key={s._id}>
+                              <TableCell className="font-medium">{s.title}</TableCell>
+                              <TableCell>{s.seasonName || "-"}</TableCell>
+                              <TableCell>{s.episodeName || "-"}</TableCell>
+                              <TableCell>{s.fileSize || "-"}</TableCell>
+                              <TableCell className="max-w-xs truncate">{s.externalUrl}</TableCell>
+                              <TableCell>
+                                {s.createdAt 
+                                  ? new Date(s.createdAt).toLocaleDateString()
+                                  : "-"
+                                }
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <div className="flex gap-2 justify-end">
+                                  <Button 
+                                    variant="destructive" 
+                                    size="sm"
+                                    onClick={() => handleDeleteSeries(s._id)}
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
           </div>
         </main>
       </div>

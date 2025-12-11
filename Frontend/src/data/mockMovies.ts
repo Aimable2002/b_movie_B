@@ -11,6 +11,19 @@ export interface Movie {
   updatedAt?: string;
 }
 
+export interface Series {
+  _id: string;
+  title: string;
+  externalUrl: string;
+  seasonName?: string;
+  episodeName?: string;
+  downloadUrl?: string;
+  streamUrl?: string;
+  fileSize?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export const getMovies = async (): Promise<Movie[]> => {
   try {
     const token = localStorage.getItem("authToken");
@@ -161,5 +174,75 @@ export const getStreamUrl = async (id: string): Promise<string | null> => {
   } catch (error) {
     console.error("Error getting stream URL:", error);
     return null;
+  }
+};
+
+
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("authToken");
+  return {
+    "Authorization": `Bearer ${token}`,
+    "Content-Type": "application/json",
+  };
+};
+
+
+export const getSeries = async (): Promise<Series[]> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/series/all`, {
+      method: "GET",
+      headers: getAuthHeaders(),
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      return data.series || [];
+    }
+    return [];
+  } catch (error) {
+    console.error("Error fetching series:", error);
+    return [];
+  }
+};
+
+export const addSeries = async (series: {
+  title: string;
+  externalUrl: string;
+  seasonName?: string;
+  episodeName?: string;
+  downloadUrl?: string;
+  streamUrl?: string;
+  fileSize?: string;
+}): Promise<Series | null> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/series/create`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(series),
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      return data.series;
+    }
+    throw new Error(data.message || "Failed to add series");
+  } catch (error) {
+    console.error("Error adding series:", error);
+    throw error;
+  }
+};
+
+export const deleteSeries = async (id: string): Promise<boolean> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/series/delete/${id}`, {
+      method: "DELETE",
+      headers: getAuthHeaders(),
+    });
+
+    const data = await response.json();
+    return data.success === true;
+  } catch (error) {
+    console.error("Error deleting series:", error);
+    return false;
   }
 };
