@@ -4,6 +4,7 @@ import MovieInfo from "../components/MovieInfo";
 import DownloadSection from "../components/DownloadSection";
 import AdBanner from "../components/AdBanner";
 import { Loader2, AlertCircle } from "lucide-react";
+import Watch from "./Watch";
 
 const Index = () => {
   const [movieData, setMovieData] = useState<Movie | null>(null);
@@ -99,6 +100,10 @@ const Index = () => {
                 title={movieData.title}
                 fileSize={movieData.fileSize}
               />
+
+              <Watch 
+                id={movieData._id}
+              />
               
               <DownloadSection 
                 downloadUrl={movieData.downloadUrl}
@@ -123,7 +128,7 @@ const Index = () => {
           <div className="container mx-auto px-4 max-w-5xl">
             <div className="text-center space-y-3">
               <p className="text-sm text-muted-foreground">
-                © {new Date().getFullYear()} AgasobanuyeTimes.space Download Page. All rights reserved.
+                © {new Date().getFullYear()} AgasobanuyeTimes.space Download Page. All rights reserved. Crafted by Reuble Group.
               </p>
               <p className="text-xs text-muted-foreground/60 max-w-lg mx-auto">
                 Files hosted externally. AgasobanuyeTimes.space only provides redirection. We do not host or store any files on our servers.

@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { getStreamUrl } from "../data/mockMovies";
 import { Loader2, ArrowLeft } from "lucide-react";
 import logo from '../../public/logo.png'
 
-const Watch = () => {
-  const { id } = useParams();
+interface movieProp {
+  id: string
+}
+
+const Watch = ({ id }: movieProp) => {
+  // const { id } = useParams();
   const navigate = useNavigate();
   const [streamUrl, setStreamUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -36,30 +40,7 @@ const Watch = () => {
     <div className="min-h-screen bg-[#0d0d0d] text-white flex flex-col">
 
       {/* Header */}
-      <header className="flex items-center gap-4 px-5 py-4 border-b border-white/10 bg-black/40 backdrop-blur-sm sticky top-0 z-50">
-
-        {/* Back Button */}
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-2 hover:text-gray-300 transition"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          Back
-        </button>
-
-        {/* Logo */}
-        <div className="flex-1 flex justify-center">
-          <img
-            src={logo}  
-            alt="Logo"
-            width={100}
-            className="h-10 object-contain"
-          />
-        </div>
-
-        {/* Empty space to balance layout */}
-        <div className="w-[60px]"></div>
-      </header>
+      {/*  */}
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-6">

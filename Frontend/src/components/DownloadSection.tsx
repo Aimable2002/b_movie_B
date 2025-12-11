@@ -123,18 +123,6 @@ const DownloadSection = ({ externalUrl, movieId, title }: DownloadSectionProps) 
   //   }
   // };
 
-  const handleOpenInNewTab = async () => {
-    try {
-      const url = await getDownloadUrl(movieId);
-      if (url) {
-        window.open(url, '_blank');
-        toast.info("Opening file preview...");
-      }
-    } catch (error) {
-      console.error("Error getting download URL:", error);
-      toast.error("Failed to open file");
-    }
-  };
 
   const handleCancel = () => {
     setIsDownloading(false);
@@ -161,7 +149,7 @@ const DownloadSection = ({ externalUrl, movieId, title }: DownloadSectionProps) 
         <Button 
           variant="default" 
           size="lg" 
-          className="flex-1 min-h-8"
+          className="flex-1 min-h-8 cursor-pointer"
           onClick={handleDownload}
           disabled={isDownloading}
         >
@@ -169,7 +157,7 @@ const DownloadSection = ({ externalUrl, movieId, title }: DownloadSectionProps) 
           {isDownloading ? "Downloading..." : downloadComplete ? "Download Again" : "Download Now"}
         </Button>
         
-        <Button 
+        {/* <Button 
           variant="default" 
           size="lg" 
           className="flex-1 min-h-8"
@@ -178,12 +166,12 @@ const DownloadSection = ({ externalUrl, movieId, title }: DownloadSectionProps) 
         >
           <Play className="w-5 h-5 mr-2" />
           Watch Now
-        </Button>
+        </Button> */}
         
         <Button 
           variant="outline" 
           size="lg" 
-          className="flex-1 sm:flex-none sm:w-auto min-h-8"
+          className="flex-1 sm:flex-none sm:w-auto min-h-8 cursor-pointer"
           onClick={handleCancel}
           disabled={!isDownloading}
         >
@@ -194,7 +182,7 @@ const DownloadSection = ({ externalUrl, movieId, title }: DownloadSectionProps) 
         <Button 
           variant="secondary" 
           size="lg" 
-          className="flex-1 sm:flex-none sm:w-auto min-h-8"
+          className="flex-1 sm:flex-none sm:w-auto min-h-8 cursor-pointer"
           onClick={handleReturnHome}
         >
           <Home className="w-5 h-5 mr-2" />
@@ -213,7 +201,7 @@ const DownloadSection = ({ externalUrl, movieId, title }: DownloadSectionProps) 
           >
             Direct Download
           </Button>
-          <Button 
+          {/* <Button 
             variant="outline" 
             size="sm"
             onClick={handleWatchNow}
@@ -228,7 +216,7 @@ const DownloadSection = ({ externalUrl, movieId, title }: DownloadSectionProps) 
           >
             <ExternalLink className="w-4 h-4 mr-2" />
             Open in New Tab
-          </Button>
+          </Button> */}
           <Button 
             variant="default" 
             size="sm"
