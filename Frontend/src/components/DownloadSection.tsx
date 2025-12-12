@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Download, X, Home, ExternalLink, Zap, Play } from "lucide-react";
+import { Download, X, Home, Zap} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProgressBar from "./ProgressBar";
 import { toast } from "sonner";
