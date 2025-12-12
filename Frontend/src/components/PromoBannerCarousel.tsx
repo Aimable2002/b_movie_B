@@ -24,7 +24,7 @@ const promoSlides: PromoSlide[] = [
     headline: 'Professional Website development',
     offer: 'Starting at 100,000 RWF',
     ctaText: 'GET YOURS NOW →',
-    ctaUrl: 'https://wa.me/0787462384',
+    ctaUrl: 'https://wa.me/+250787462384',
     accentColor: 'from-orange-500 to-red-500',
   },
   {
@@ -35,7 +35,7 @@ const promoSlides: PromoSlide[] = [
     headline: 'IT support & Maintenance',
     offer: 'From RWF 5,000/month',
     ctaText: 'START FREE TRIAL →',
-    ctaUrl: 'https://wa.me/0787462384',
+    ctaUrl: 'https://wa.me/+250787462384',
     accentColor: 'from-cyan-500 to-blue-500',
   },
   {
@@ -46,7 +46,7 @@ const promoSlides: PromoSlide[] = [
     headline: 'Mobile App Development',
     offer: 'Custom Quote',
     ctaText: 'GET FREE QUOTE →',
-    ctaUrl: 'https://wa.me/0787462384',
+    ctaUrl: 'https://wa.me/+250787462384',
     accentColor: 'from-purple-500 to-pink-500',
   },
 ];

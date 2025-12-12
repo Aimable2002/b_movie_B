@@ -1,4 +1,5 @@
 import Movie from '../model/movieModel.js'
+import Series from '../model/serieModel.js'
 
 export const uploadMovie = async (req, res) => {
     try {
@@ -59,21 +60,70 @@ export const getMovieByExternalUrl = async (req, res) => {
         // Decode encoded URLs like http%3A%2F%2Fexample.com%2FserieA
         externalUrl = decodeURIComponent(externalUrl);
 
+        // 1. First, try to find a movie
         const movie = await Movie.findOne({ externalUrl });
 
-        if (!movie) {
-            return res.status(404).json({
-                success: false,
-                message: 'Movie not found'
+        if (movie) {
+            return res.status(200).json({
+                success: true,
+                movie: movie,
+                contentType: 'movie'
             });
         }
 
-        return res.status(200).json({
-            success: true,
-            movie
+        // 2. If not a movie, try to find a series episode
+        const series = await Series.findOne({
+            'seasons.episodes.externalUrl': externalUrl
+        });
+
+
+        if (series) {
+            // Find the specific episode
+            let foundEpisode = null;
+            let foundSeason = null;
+            
+            for (const season of series.seasons) {
+                const episode = season.episodes.find(ep => ep.externalUrl === externalUrl);
+                if (episode) {
+                    foundEpisode = episode;
+                    foundSeason = season;
+                    break;
+                }
+            }
+
+            if (foundEpisode) {
+                // Create a flattened episode object with movie-like structure
+                const episodeAsMovie = {
+                    _id: foundEpisode._id,
+                    title: `${series.title} - ${foundSeason.seasonName} - ${foundEpisode.title}`,
+                    seriesTitle: series.title,
+                    seasonName: foundSeason.seasonName,
+                    episodeName: foundEpisode.title,
+                    downloadUrl: foundEpisode.downloadUrl,
+                    streamUrl: foundEpisode.streamUrl,
+                    externalUrl: foundEpisode.externalUrl,
+                    fileSize: foundEpisode.fileSize,
+                    createdAt: series.createdAt,
+                    updatedAt: series.updatedAt,
+                    seriesId: series._id,
+                    seasonId: foundSeason._id
+                };
+
+                return res.status(200).json({
+                    success: true,
+                    movie: episodeAsMovie, // Still call it "movie" for frontend compatibility
+                    contentType: 'series'
+                });
+            }
+        }
+
+        // 3. If nothing found
+        return res.status(404).json({
+            success: false,
+            message: 'Content not found'
         });
     } catch (err) {
-        console.error('Error getting movie:', err);
+        console.error('Error getting content by external URL:', err);
         return res.status(500).json({
             success: false,
             message: 'Internal server error'

@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getStreamUrl } from "../data/mockMovies";
-import { Loader2, ArrowLeft } from "lucide-react";
-import logo from '../../public/logo.png'
+import { Loader2} from "lucide-react";
 
 interface movieProp {
-  id: string
+  url: string
 }
 
-const Watch = ({ id }: movieProp) => {
+const Watch = ({ url }: movieProp) => {
   // const { id } = useParams();
   const navigate = useNavigate();
   const [streamUrl, setStreamUrl] = useState<string | null>(null);
@@ -18,14 +17,7 @@ const Watch = ({ id }: movieProp) => {
   useEffect(() => {
     const fetchStream = async () => {
       try {
-        const url = await getStreamUrl(id as string);
-
-        if (!url) {
-          setError("Stream is not available.");
-          return;
-        }
-
-        setStreamUrl(url);
+        setStreamUrl(url)
       } catch (err) {
         setError("Unable to load video stream.");
       } finally {
@@ -34,18 +26,13 @@ const Watch = ({ id }: movieProp) => {
     };
 
     fetchStream();
-  }, [id]);
+  }, [url]);
 
   return (
-    <div className="min-h-screen bg-[#0d0d0d] text-white flex flex-col">
+    <div className="min-h-[40%] bg-[#0d0d0d] text-white flex flex-col">
 
-      {/* Header */}
-      {/*  */}
-
-      {/* Main Content */}
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-6">
 
-        {/* Loading State */}
         {loading && (
           <div className="flex flex-col items-center">
             <Loader2 className="w-14 h-14 animate-spin text-primary mb-4" />
@@ -53,7 +40,6 @@ const Watch = ({ id }: movieProp) => {
           </div>
         )}
 
-        {/* Error */}
         {!loading && error && (
           <div className="text-center">
             <p className="text-red-400 text-lg mb-3">{error}</p>
@@ -65,8 +51,6 @@ const Watch = ({ id }: movieProp) => {
             </button>
           </div>
         )}
-
-        {/* Video Player */}
         {streamUrl && (
           <div className="w-full max-w-5xl mt-4 animate-fade-in">
             <div className="aspect-video rounded-xl overflow-hidden border border-white/10 shadow-xl">

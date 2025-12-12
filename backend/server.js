@@ -22,7 +22,11 @@ app.use(cors())
 // {origin: "http://localhost:8080/"}
 app.use('/api/auth', authRoute)
 app.use('/api/movie', movieRoute)
-app.use('/api/serie', serieRoute)
+// app.use('/api/series', (req, res, next) => {
+//     console.log('req.body on server.js is ', req.body)
+//     next()
+// })
+app.use('/api/series', serieRoute);
 
 
 app.use(express.static(path.join(__dirname, '..', 'Frontend', 'dist')))

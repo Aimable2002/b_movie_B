@@ -29,6 +29,7 @@ const Index = () => {
         console.log("Fetching movie data for:", movieLink);
 
         const movie = await getMovieByExternalUrl(movieLink);
+        console.log('movie :', movie)
 
         if (!movie) {
           setError("Movie not found");
@@ -102,7 +103,7 @@ const Index = () => {
               />
 
               <Watch 
-                id={movieData._id}
+                url={movieData.streamUrl}
               />
               
               <DownloadSection 

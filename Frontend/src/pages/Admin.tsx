@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { getMovies, addMovie, updateMovie, deleteMovie, type Movie, 
-  getSeries, addSeries, deleteSeries, type Series
+  getSeries, addSeries, deleteSeries, type Series,
+  updateSeries
 } from "../data/mockMovies";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input"; 
@@ -37,6 +38,7 @@ const Admin = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingMovie, setEditingMovie] = useState<Movie | null>(null);
+  const [editingSeries, setEditingSeries] = useState<Series | null>(null);
   const [contentType, setContentType] = useState<"movie" | "series">("movie");
   const [formData, setFormData] = useState({
     title: "",
@@ -51,6 +53,7 @@ const Admin = () => {
   // Fetch movies on component mount
   useEffect(() => {
     fetchMovies();
+    fetchSeries()
   }, []);
 
   const fetchMovies = async () => {
@@ -66,18 +69,20 @@ const Admin = () => {
     }
   };
 
-  const fetchSeries = async () => {
-    setIsSeriesLoading(true);
-    try {
-      const data = await getSeries();
-      setSeriesList(data);
-    } catch (error) {
-      console.error("Error fetching series:", error);
-      toast.error("Failed to load series");
-    } finally {
-      setIsSeriesLoading(false);
-    }
-  };
+const fetchSeries = async () => {
+  setIsSeriesLoading(true);
+  try {
+    console.log('First action to call the api');
+    const data = await getSeries();
+    console.log('data :\n', data);
+    setSeriesList(data);
+  } catch (error) {
+    console.error("Error fetching series:", error);
+    toast.error("Failed to load series");
+  } finally {
+    setIsSeriesLoading(false);
+  }
+};
 
   const handleLogout = () => {
     logout();
@@ -95,52 +100,83 @@ const Admin = () => {
       episodeName: ""
     });
     setEditingMovie(null);
+    setEditingSeries(null);
   };
 
-  const handleOpenDialog = (movie?: Movie) => {
-    if (movie) {
-      setEditingMovie(movie);
+const handleOpenDialog = (item?: Movie | Series) => {
+  if (item) {
+    if ('fileSize' in item && !('episodeName' in item)) {
+      setEditingMovie(item as Movie);
+      setEditingSeries(null); 
+      setContentType('movie'); 
       setFormData({
-        title: movie.title,
-        downloadUrl: movie.downloadUrl,
-        streamUrl: movie.streamUrl,
-        externalUrl: movie.externalUrl,
-        fileSize: movie.fileSize,
+        title: item.title,
+        downloadUrl: item.downloadUrl || '',
+        streamUrl: item.streamUrl || '',
+        externalUrl: item.externalUrl,
+        fileSize: item.fileSize || '',
         seasonName: "",
         episodeName: ""
       });
     } else {
-      resetForm();
+      const seriesItem = item as Series;
+      setEditingSeries(seriesItem);
+      setEditingMovie(null); 
+      setContentType('series'); 
+      setFormData({
+        title: seriesItem.seriesTitle || seriesItem.title,
+        downloadUrl: seriesItem.downloadUrl || '',
+        streamUrl: seriesItem.streamUrl || '',
+        externalUrl: seriesItem.externalUrl,
+        fileSize: seriesItem.fileSize || '',
+        seasonName: seriesItem.seasonName || "",
+        episodeName: seriesItem.episodeName || ""
+      });
     }
-    setIsDialogOpen(true);
-  };
+  } else {
+    resetForm();
+  }
+  setIsDialogOpen(true);
+};
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setIsSubmitting(true);
 
-    try {
-      if (contentType == 'movie'){
-        if (editingMovie) {
-          await updateMovie(editingMovie._id, {
-            title: formData.title,
-            downloadUrl: formData.downloadUrl,
-            streamUrl: formData.streamUrl,
-            externalUrl: formData.externalUrl
-          });
-          toast.success("Movie updated successfully");
-        } else {
-          await addMovie({
-            title: formData.title,
-            downloadUrl: formData.downloadUrl,
-            streamUrl: formData.streamUrl,
-            externalUrl: formData.externalUrl,
-            fileSize: formData.fileSize
-          });
-          toast.success("Movie added successfully");
-        }
-        await fetchMovies();
-      }else {
+  try {
+    if (contentType == 'movie'){
+      if (editingMovie) {
+        await updateMovie(editingMovie._id, {
+          title: formData.title,
+          downloadUrl: formData.downloadUrl,
+          streamUrl: formData.streamUrl,
+          externalUrl: formData.externalUrl
+        });
+        toast.success("Movie updated successfully");
+      } else {
+        await addMovie({
+          title: formData.title,
+          downloadUrl: formData.downloadUrl,
+          streamUrl: formData.streamUrl,
+          externalUrl: formData.externalUrl,
+          fileSize: formData.fileSize
+        });
+        toast.success("Movie added successfully");
+      }
+      await fetchMovies();
+    } else { // SERIES
+      if (editingSeries) { // Check editingSeries, NOT editingMovie
+        await updateSeries(editingSeries._id, {
+          title: formData.title,
+          seasonName: formData.seasonName,
+          episodeName: formData.episodeName,
+          downloadUrl: formData.downloadUrl,
+          streamUrl: formData.streamUrl,
+          externalUrl: formData.externalUrl,
+          fileSize: formData.fileSize
+        });
+        toast.success("Series episode updated successfully");
+      } else {
         await addSeries({
           title: formData.title,
           externalUrl: formData.externalUrl,
@@ -151,20 +187,21 @@ const Admin = () => {
           fileSize: formData.fileSize
         });
         toast.success("Series episode added successfully");
-        await fetchSeries();
       }
-    
-      setIsDialogOpen(false);
-      resetForm();
-    } catch (error: any) {
-      console.error("Error saving movie:", error);
-      toast.error(error.message || "Failed to save movie");
-    } finally {
-      setIsSubmitting(false);
+      await fetchSeries();
     }
-  };
+  
+    setIsDialogOpen(false);
+    resetForm();
+  } catch (error: any) {
+    console.error("Error saving content:", error);
+    toast.error(error.message || "Failed to save content");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
-  const handleDelete = async (id: string) => {
+const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this movie?")) {
       return;
     }
@@ -230,7 +267,7 @@ const Admin = () => {
         <main className="container mx-auto px-4 py-8">
           <div className="glass-card rounded-2xl p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold text-foreground">Movie Management</h2>
+              <h2 className="text-lg font-semibold text-foreground">Movie/Servie</h2>
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
                   <Button onClick={() => handleOpenDialog()}>
@@ -240,10 +277,12 @@ const Admin = () => {
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-lg max-h-[80vh] overflow-y-auto">
                   <DialogHeader>
-                    <DialogTitle>{editingMovie ? "Edit Movie" : "Add New Movie"}</DialogTitle>
+                    <DialogTitle>
+                      {editingMovie ? "Edit Movie" : editingSeries ? "Edit Series Episode" : "Add New Content"}
+                    </DialogTitle>
                   </DialogHeader>
                   <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-                    {!editingMovie && (
+                    {!editingMovie && !editingSeries && (
                         <div className="space-y-2">
                           <Label>Content Type</Label>
                           <RadioGroup 
@@ -355,10 +394,10 @@ const Admin = () => {
                         {isSubmitting ? (
                           <>
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            {editingMovie ? "Updating..." : "Adding..."}
+                            {editingMovie || editingSeries ? "Updating..." : "Adding..."}
                           </>
                         ) : (
-                          `${editingMovie ? "Update" : "Add"} ${contentType == 'movie' ? 'Movie' : 'Serie'}`
+                          `${editingMovie || editingSeries ? "Update" : "Add"} ${editingSeries ? 'Series Episode' : contentType === 'movie' ? 'Movie' : 'Series Episode'}`
                         )}
                       </Button>
                     </div>
@@ -452,7 +491,7 @@ const Admin = () => {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Title</TableHead>
+                          <TableHead>Series Title</TableHead>
                           <TableHead>Season</TableHead>
                           <TableHead>Episode</TableHead>
                           <TableHead>File Size</TableHead>
@@ -465,13 +504,13 @@ const Admin = () => {
                         {seriesList.length === 0 ? (
                           <TableRow>
                             <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
-                              No series found. Add your first series!
+                              No episodes found. Add your first series episode!
                             </TableCell>
                           </TableRow>
                         ) : (
-                          seriesList.map((s) => (
+                          seriesList.map((s: any) => (
                             <TableRow key={s._id}>
-                              <TableCell className="font-medium">{s.title}</TableCell>
+                              <TableCell className="font-medium">{s.seriesTitle || s.title}</TableCell>
                               <TableCell>{s.seasonName || "-"}</TableCell>
                               <TableCell>{s.episodeName || "-"}</TableCell>
                               <TableCell>{s.fileSize || "-"}</TableCell>
@@ -484,6 +523,13 @@ const Admin = () => {
                               </TableCell>
                               <TableCell className="text-right">
                                 <div className="flex gap-2 justify-end">
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm"
+                                    onClick={() => handleOpenDialog(s)}
+                                  >
+                                    <Pencil className="w-4 h-4" />
+                                  </Button>
                                   <Button 
                                     variant="destructive" 
                                     size="sm"

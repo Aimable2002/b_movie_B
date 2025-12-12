@@ -1,4 +1,4 @@
-// routes/seriesRoutes.js
+// serieRoute.js - FIXED VERSION
 import express from 'express';
 import { 
   getAllSeries, 
@@ -13,14 +13,19 @@ import { authenticateRoute } from '../middleware/protectRoute.js';
 
 const router = express.Router();
 
+// SPECIFIC ROUTES FIRST
+router.get('/all', (req, res) => {
+    console.log('req, body in route :', req.body)
+    return getAllSeries(req, res);
+});
 
-router.get('/:id', getSeriesById);
+// DYNAMIC ROUTES LAST
 router.get('/season/:id', getSeasonById);
 router.get('/episode/:id', getEpisodeById);
+router.get('/:id', getSeriesById);
 
-router.get('/all', authenticateRoute, getAllSeries);
 router.post('/create', authenticateRoute, createSeries);
 router.put('/update/:id', authenticateRoute, updateSeries);
 router.delete('/delete/:id', authenticateRoute, deleteSeries);
 
-export default router
+export default router;

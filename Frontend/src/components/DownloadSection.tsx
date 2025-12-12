@@ -86,29 +86,29 @@ const DownloadSection = ({ externalUrl, movieId, title }: DownloadSectionProps) 
   // };
 
 
-  const handleDirectDownload = async () => {
-    try {
-      const downloadUrl = `/api/movie/direct/download?url=${encodeURIComponent(movieId)}`;
-      const link = document.createElement("a");
-      link.href = downloadUrl;
-      link.setAttribute("download", "movie.mp4");
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      toast.success("Direct download started!");
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to start download");
-    }
-  };
+  // const handleDirectDownload = async () => {
+  //   try {
+  //     const downloadUrl = `/api/movie/direct/download?url=${encodeURIComponent(movieId)}`;
+  //     const link = document.createElement("a");
+  //     link.href = downloadUrl;
+  //     link.setAttribute("download", "movie.mp4");
+  //     document.body.appendChild(link);
+  //     link.click();
+  //     link.remove();
+  //     toast.success("Direct download started!");
+  //   } catch (err) {
+  //     console.error(err);
+  //     toast.error("Failed to start download");
+  //   }
+  // };
   
 
 
   const navigate = useNavigate();
 
-  const handleWatchNow = () => {
-    navigate(`/watch/${movieId}`);
-  };
+  // const handleWatchNow = () => {
+  //   navigate(`/watch/${movieId}`);
+  // };
 
   // const handleWatchNow = async () => {
   //   try {
@@ -194,13 +194,13 @@ const DownloadSection = ({ externalUrl, movieId, title }: DownloadSectionProps) 
       <div className="glass-card-subtle rounded-xl p-4">
         <p className="text-sm text-muted-foreground mb-3">Having trouble downloading? Try these options:</p>
         <div className="flex flex-wrap gap-3">
-          <Button 
+          {/* <Button 
             variant="default" 
             size="sm"
             onClick={handleDirectDownload}
           >
             Direct Download
-          </Button>
+          </Button> */}
           {/* <Button 
             variant="outline" 
             size="sm"
@@ -220,7 +220,7 @@ const DownloadSection = ({ externalUrl, movieId, title }: DownloadSectionProps) 
           <Button 
             variant="default" 
             size="sm"
-            onClick={() => navigate('https://wa.me/0788484589')}
+            onClick={() => navigate('https://wa.me/+250788484589')}
             disabled={isDownloading}
             className="bg-primary hover:bg-primary/90"
           >

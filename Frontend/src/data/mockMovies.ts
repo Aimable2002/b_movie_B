@@ -1,5 +1,5 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || "https://agasobanuye-yrqs.onrender.com/api";
-
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// "https://agasobanuye-yrqs.onrender.com/api" ||
 export interface Movie {
   _id: string;
   title: string;
@@ -9,19 +9,27 @@ export interface Movie {
   fileSize: string;
   createdAt?: string;
   updatedAt?: string;
+  seriesTitle?: string;
+  seasonName?: string;
+  episodeName?: string;
+  seriesId?: string;
+  seasonId?: string;
 }
 
 export interface Series {
   _id: string;
-  title: string;
-  externalUrl: string;
+  title: string; // This is now the combined title or seriesTitle
+  seriesTitle?: string; // Add this
   seasonName?: string;
   episodeName?: string;
   downloadUrl?: string;
   streamUrl?: string;
+  externalUrl: string;
   fileSize?: string;
   createdAt?: string;
   updatedAt?: string;
+  seriesId?: string; // Add this
+  seasonId?: string; // Add this
 }
 
 export const getMovies = async (): Promise<Movie[]> => {
@@ -189,6 +197,7 @@ const getAuthHeaders = () => {
 
 export const getSeries = async (): Promise<Series[]> => {
   try {
+    console.log('get all series')
     const response = await fetch(`${API_BASE_URL}/series/all`, {
       method: "GET",
       headers: getAuthHeaders(),
@@ -215,6 +224,7 @@ export const addSeries = async (series: {
   fileSize?: string;
 }): Promise<Series | null> => {
   try {
+    console.log('series to be added :', series)
     const response = await fetch(`${API_BASE_URL}/series/create`, {
       method: "POST",
       headers: getAuthHeaders(),
@@ -228,6 +238,38 @@ export const addSeries = async (series: {
     throw new Error(data.message || "Failed to add series");
   } catch (error) {
     console.error("Error adding series:", error);
+    throw error;
+  }
+};
+
+
+export const updateSeries = async (id: string, updates: Partial<Pick<Series, 'title' | 'seasonName' | 'episodeName' | 'downloadUrl' | 'streamUrl' | 'externalUrl' | 'fileSize'>>): Promise<Series | null> => {
+  try {
+    const token = localStorage.getItem("authToken");
+    const response = await fetch(`${API_BASE_URL}/series/update/${id}`, {
+      method: "PUT",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        seriesTitle: updates.title, 
+        seasonName: updates.seasonName,
+        episodeName: updates.episodeName,
+        downloadUrl: updates.downloadUrl,
+        streamUrl: updates.streamUrl,
+        externalUrl: updates.externalUrl,
+        fileSize: updates.fileSize
+      }),
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      return data.episode; 
+    }
+    throw new Error(data.message || "Failed to update episode");
+  } catch (error) {
+    console.error("Error updating series episode:", error);
     throw error;
   }
 };
