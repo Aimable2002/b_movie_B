@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { X, Loader2, Clock, Check, Zap, Code, Server, Cpu, Mail, Phone, Globe } from "lucide-react";
+import { X, Loader2, Clock, Check, Zap, Code, Server, Cpu, Mail, Phone } from "lucide-react";
 
 interface FullScreenAdModalProps {
   onComplete: () => void;
