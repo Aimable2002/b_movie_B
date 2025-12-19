@@ -211,7 +211,7 @@ const FullScreenAdModal = ({
       className="w-full h-full flex flex-col items-center justify-center p-4 md:p-6 bg-linear-to-br from-gray-900 via-blue-900/20 to-purple-900/20 overflow-y-auto"
     >
       <div className="w-full max-w-2xl">
-        <div className="flex mt-[550px] flex-col md:flex-row items-center justify-between mb-6 md:mb-8">
+        <div className="flex mt-[550px] md:mt-[150px] flex-col md:flex-row items-center justify-between mb-6 md:mb-8">
           <div className="flex items-center mb-4 md:mb-0">
             <div className="relative mr-4">
               <div className="w-16 h-16 bg-linear-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center animate-pulse">
