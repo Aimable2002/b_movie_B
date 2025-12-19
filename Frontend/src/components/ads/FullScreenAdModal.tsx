@@ -1,4 +1,3 @@
-// components/ads/FullScreenAdModal.tsx - UPDATED WITH BETTER LAYOUT
 import { useEffect, useState, useRef } from "react";
 import { X, Loader2, Clock, Check, Zap, Code, Server, Cpu, Mail, Phone, Globe } from "lucide-react";
 
@@ -10,7 +9,6 @@ interface FullScreenAdModalProps {
   showCancel?: boolean;
 }
 
-// Type declaration for AdSense
 declare global {
   interface Window {
     adsbygoogle: any[];
@@ -36,12 +34,10 @@ const FullScreenAdModal = ({
   const contentRef = useRef<HTMLDivElement>(null);
   const isMounted = useRef(true);
 
-  // Adjust height based on content
   useEffect(() => {
     const updateHeight = () => {
       if (contentRef.current && showFallback) {
         const contentHeight = contentRef.current.scrollHeight;
-        // Set minimum height, but allow content to determine height
         const newHeight = Math.max(350, Math.min(500, contentHeight + 50));
         setContainerHeight(`${newHeight}px`);
       }
@@ -53,11 +49,9 @@ const FullScreenAdModal = ({
     return () => window.removeEventListener('resize', updateHeight);
   }, [showFallback]);
 
-  // Initialize AdSense ad
   useEffect(() => {
     isMounted.current = true;
     
-    // Start countdown timer immediately
     timerRef.current = window.setInterval(() => {
       if (isMounted.current) {
         setTimeLeft((prev) => {
@@ -71,15 +65,31 @@ const FullScreenAdModal = ({
       }
     }, 1000);
 
-    // Try to load Google AdSense
+    const showFallbackAd = () => {
+      if (!isMounted.current) return;
+      setShowFallback(true);
+      setAdLoaded(true);
+    };
+
     const loadAdSenseAd = () => {
       const container = adContainerRef.current;
       if (!container || !isMounted.current) return;
 
+      const useDevelopmentFallback = window.location.hostname === 'localhost' || 
+                                    window.location.hostname.includes('127.0.0.1') ||
+                                    !(window as any).adsbygoogle;
+
+      if (useDevelopmentFallback) {
+        setTimeout(() => {
+          if (isMounted.current) {
+            showFallbackAd();
+          }
+        }, 1000);
+        return;
+      }
+
       try {
-        // Check if AdSense is available
         if ((window as any).adsbygoogle) {
-          // Create a wrapper div that React won't touch
           const adWrapper = document.createElement('div');
           adWrapper.id = `adsense-wrapper-${Date.now()}`;
           adWrapper.style.width = '100%';
@@ -87,7 +97,6 @@ const FullScreenAdModal = ({
           adWrapper.style.position = 'relative';
           adWrapper.style.minHeight = '350px';
           
-          // Create AdSense element
           const adElement = document.createElement('ins');
           adElement.className = 'adsbygoogle';
           adElement.style.display = 'block';
@@ -96,9 +105,8 @@ const FullScreenAdModal = ({
           adElement.style.overflow = 'hidden';
           adElement.style.borderRadius = '0.5rem';
           
-          // Set AdSense properties - REPLACE WITH YOUR ACTUAL SLOT ID
           adElement.setAttribute('data-ad-client', 'ca-pub-6077829775020531');
-          adElement.setAttribute('data-ad-slot', 'YOUR_AD_SLOT_ID'); // ← REPLACE THIS
+          adElement.setAttribute('data-ad-slot', 'YOUR_AD_SLOT_ID');
           adElement.setAttribute('data-ad-format', 'auto');
           adElement.setAttribute('data-full-width-responsive', 'true');
           
@@ -106,23 +114,28 @@ const FullScreenAdModal = ({
           container.appendChild(adWrapper);
           adInstanceRef.current = adWrapper;
 
-          // Push to AdSense
           try {
             (window as any).adsbygoogle.push({});
-            setAdLoaded(true);
             
-            // Set timeout to check if ad actually loaded
             setTimeout(() => {
-              if (isMounted.current && !adLoaded) {
-                showFallbackAd();
+              if (isMounted.current) {
+                const container = adContainerRef.current;
+                if (container) {
+                  const hasAd = container.querySelector('iframe, img, div[class*="ad"]');
+                  if (!hasAd) {
+                    showFallbackAd();
+                  } else {
+                    setAdLoaded(true);
+                  }
+                } else {
+                  showFallbackAd();
+                }
               }
-            }, 4000);
+            }, 3000);
           } catch (adError) {
-            console.error('AdSense push error:', adError);
             showFallbackAd();
           }
         } else {
-          // AdSense not loaded, show fallback after short delay
           setTimeout(() => {
             if (isMounted.current) {
               showFallbackAd();
@@ -130,22 +143,12 @@ const FullScreenAdModal = ({
           }, 1500);
         }
       } catch (error) {
-        console.error('AdSense initialization error:', error);
         showFallbackAd();
       }
     };
 
-    // Show your IT service fallback ad
-    const showFallbackAd = () => {
-      if (!isMounted.current) return;
-      setShowFallback(true);
-      setAdLoaded(true);
-    };
-
-    // Load ad with small delay to ensure DOM is ready
     const loadTimer = setTimeout(loadAdSenseAd, 100);
 
-    // Cleanup function
     return () => {
       isMounted.current = false;
       
@@ -157,13 +160,10 @@ const FullScreenAdModal = ({
         clearTimeout(loadTimer);
       }
       
-      // SAFE cleanup: Only remove if it's still a child
       if (adInstanceRef.current && adInstanceRef.current.parentNode) {
         try {
           adInstanceRef.current.parentNode.removeChild(adInstanceRef.current);
-        } catch (err) {
-          // Ignore cleanup errors
-        }
+        } catch (err) {}
       }
     };
   }, []);
@@ -180,14 +180,12 @@ const FullScreenAdModal = ({
     }
   };
 
-  // Your IT Service Fallback Ad Component with better layout
   const ServiceAd = () => (
     <div 
       ref={contentRef}
       className="w-full h-full flex flex-col items-center justify-center p-4 md:p-6 bg-linear-to-br from-gray-900 via-blue-900/20 to-purple-900/20 overflow-y-auto"
     >
       <div className="w-full max-w-2xl">
-        {/* Header with Logo */}
         <div className="flex mt-[550px] flex-col md:flex-row items-center justify-between mb-6 md:mb-8">
           <div className="flex items-center mb-4 md:mb-0">
             <div className="relative mr-4">
@@ -206,13 +204,11 @@ const FullScreenAdModal = ({
             </div>
           </div>
           
-          {/* Badge */}
           <span className="inline-block bg-linear-to-r from-yellow-500 to-orange-500 text-black text-xs font-bold px-3 py-1.5 rounded-full">
             🚀 EXPERT TEAM
           </span>
         </div>
 
-        {/* Services Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 md:mb-8">
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10 hover:border-blue-500/50 transition-colors">
             <div className="flex items-center mb-3">
@@ -239,7 +235,6 @@ const FullScreenAdModal = ({
           </div>
         </div>
 
-        {/* Contact Section - NOW MORE PROMINENT */}
         <div className="bg-linear-to-r from-blue-900/30 via-purple-900/20 to-gray-900/30 rounded-xl p-5 md:p-6 mb-6 border border-white/10">
           <h4 className="text-lg font-bold text-white mb-4 flex items-center">
             <Mail className="w-5 h-5 mr-2 text-blue-400" />
@@ -247,7 +242,6 @@ const FullScreenAdModal = ({
           </h4>
           
           <div className="space-y-3">
-            {/* WhatsApp - PRIMARY CONTACT */}
             <a 
               href="https://wa.me/+250788484589" 
               target="_blank" 
@@ -272,19 +266,20 @@ const FullScreenAdModal = ({
               </div>
             </a>
 
-            {/* Phone */}
-            <div className="flex items-center p-3 bg-blue-600/20 border border-blue-500/30 rounded-lg">
+            <a
+              href="tel:+250788484589"
+              className="flex items-center p-3 bg-blue-600/20 border border-blue-500/30 rounded-lg"
+            >
               <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center mr-3">
                 <Phone className="w-5 h-5 text-white" />
               </div>
               <div>
                 <p className="font-bold text-white">Call Us</p>
-                <p className="text-sm text-gray-300">+250 787 462 384</p>
+                <p className="text-sm text-gray-300">+250 788 484 589</p>
               </div>
-            </div>
+            </a>
 
-            {/* Website */}
-            <a 
+            {/* <a 
               href="https://reuble.com" 
               target="_blank" 
               rel="noopener noreferrer"
@@ -304,11 +299,10 @@ const FullScreenAdModal = ({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
               </div>
-            </a>
+            </a> */}
           </div>
         </div>
 
-        {/* Pricing/Offer */}
         <div className="text-center mb-4">
           <div className="inline-flex items-center bg-black/40 px-4 py-2 rounded-full border border-white/10">
             <span className="text-amber-300 font-bold text-lg mr-2">🔥 LIMITED OFFER:</span>
@@ -316,7 +310,6 @@ const FullScreenAdModal = ({
           </div>
         </div>
 
-        {/* Footer Note */}
         <div className="text-center pt-4 border-t border-white/10">
           <p className="text-xs text-gray-400">
             This advertisement supports our free service. Contact us for custom IT solutions!
@@ -328,7 +321,6 @@ const FullScreenAdModal = ({
 
   return (
     <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
-      {/* HEADER */}
       <header className="flex items-center justify-between px-4 py-3 bg-gray-900 border-b border-gray-800 shrink-0">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
@@ -347,10 +339,8 @@ const FullScreenAdModal = ({
         )}
       </header>
 
-      {/* MAIN CONTENT - Scrollable area */}
       <main className="flex-1 overflow-y-auto">
         <div className="min-h-full flex flex-col px-4 py-4 md:py-8">
-          {/* TIMER */}
           <div className="absolute top-16 right-4 bg-black/80 backdrop-blur-sm px-3 py-1.5 rounded-full border border-gray-700 z-10">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-amber-400" />
@@ -361,7 +351,6 @@ const FullScreenAdModal = ({
             </div>
           </div>
 
-          {/* AD CONTENT AREA - Dynamic height */}
           <div className="flex-1 flex flex-col items-center justify-center mb-6 md:mb-8">
             <div className="max-w-4xl w-full">
               <div 
@@ -373,7 +362,6 @@ const FullScreenAdModal = ({
                 }}
               >
                 <div ref={adContainerRef} className="w-full h-full">
-                  {/* Loading state */}
                   {!adLoaded && (
                     <div className="w-full h-full flex flex-col items-center justify-center bg-linear-to-br from-gray-900 to-black">
                       <div className="text-center px-4">
@@ -394,12 +382,10 @@ const FullScreenAdModal = ({
                     </div>
                   )}
                   
-                  {/* Fallback ad */}
                   {adLoaded && showFallback && <ServiceAd />}
                 </div>
               </div>
 
-              {/* INSTRUCTIONS */}
               <div className="text-center max-w-md mx-auto mb-8">
                 <p className="text-gray-300 text-lg font-medium mb-2">
                   Please watch this advertisement to continue
@@ -417,7 +403,6 @@ const FullScreenAdModal = ({
             </div>
           </div>
 
-          {/* CONTINUE BUTTON - Fixed at bottom of scrollable area */}
           <div className="mt-auto pb-6">
             <div className="max-w-md mx-auto">
               <button
@@ -446,7 +431,6 @@ const FullScreenAdModal = ({
                 )}
               </button>
               
-              {/* Additional guidance */}
               <div className="p-4 bg-gray-900/50 rounded-lg border border-gray-800">
                 <p className="text-gray-400 text-sm text-center">
                   This advertisement supports our free service. 
