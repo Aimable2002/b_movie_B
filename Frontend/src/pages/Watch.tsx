@@ -61,11 +61,13 @@ const Watch = ({ url }: movieProp) => {
               ></iframe>
             </div>
 
-            <div className="mt-4 text-center text-gray-400">
-              <p className="text-sm opacity-70">
-                If the video doesn’t load, refresh the page or try again later.
-              </p>
-            </div>
+            {loading && (
+              <div className="mt-4 text-center text-gray-400">
+                <p className="text-sm opacity-70">
+                  Niba video imaze iminota 2 itarafunguka. refreshinga page wongere utegereze
+                </p>
+              </div>
+            )}
           </div>
         )}
       </div>

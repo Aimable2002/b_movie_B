@@ -21,7 +21,7 @@ const promoSlides: PromoSlide[] = [
     image: promoItServices,
     icon: <Globe className="w-5 h-5" />,
     badge: '🔥 HOT DEAL',
-    headline: 'Professional Website development',
+    headline: 'Professional Website Development',
     offer: 'Starting at 100,000 RWF',
     ctaText: 'GET YOURS NOW →',
     ctaUrl: 'https://wa.me/+250787462384',
@@ -32,7 +32,7 @@ const promoSlides: PromoSlide[] = [
     image: promoHosting,
     icon: <Server className="w-5 h-5" />,
     badge: '⚡ LIMITED TIME',
-    headline: 'IT support & Maintenance',
+    headline: 'IT Support & Maintenance',
     offer: 'From RWF 5,000/month',
     ctaText: 'START FREE TRIAL →',
     ctaUrl: 'https://wa.me/+250787462384',
@@ -67,98 +67,85 @@ const PromoBannerCarousel = () => {
   const prevSlide = () => setCurrentIndex((prev) => (prev - 1 + promoSlides.length) % promoSlides.length);
 
   return (
-    <div className="relative rounded-xl overflow-hidden group">
-      {/* Animated border glow */}
-      <div className={`absolute -inset-[2px] bg-linear-to-r ${currentSlide.accentColor} rounded-xl opacity-75 blur-sm animate-pulse`} />
-      
-      <div className="relative bg-black rounded-xl overflow-hidden">
+    <div className="relative rounded-lg overflow-hidden bg-black h-full min-h-[200px] sm:min-h-[220px]">
+      <div className="relative h-full">
         {/* Background Image */}
         <div className="absolute inset-0">
           <img
             src={currentSlide.image}
             alt={currentSlide.headline}
-            className="w-full h-full object-cover opacity-40 scale-105 group-hover:scale-110 transition-transform duration-700"
+            className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-linear-to-r from-black via-black/80 to-transparent" />
+          {/* Text overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent" />
         </div>
 
-        {/* Content */}
-        <div className="relative flex items-center justify-between p-4 sm:p-6 md:p-8 min-h-[140px] sm:min-h-[160px]">
-          <div className="flex-1 space-y-2 sm:space-y-3">
-            {/* Badges Row */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="bg-white/10 backdrop-blur-sm text-white/60 text-[9px] sm:text-[10px] font-semibold px-2 py-0.5 rounded border border-white/20">
-                ADVERTISEMENT
-              </span>
-              <span className={`bg-linear-to-r ${currentSlide.accentColor} text-white text-[10px] sm:text-xs font-bold px-2 sm:px-3 py-1 rounded-full animate-bounce`}>
-                {currentSlide.badge}
-              </span>
-            </div>
-
-            {/* Headline with icon */}
-            <div className="flex items-center gap-2">
-              <div className={`p-1.5 sm:p-2 rounded-lg bg-linear-to-r ${currentSlide.accentColor} text-white`}>
-                {currentSlide.icon}
+        {/* Content with proper padding */}
+        <div className="relative h-full p-4 sm:p-6 md:p-8 flex flex-col justify-center">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex-1 space-y-3">
+              {/* Badges */}
+              <div className="flex items-center gap-2">
+                <span className="bg-white/20 text-white text-xs font-medium px-2 py-1 rounded">
+                  ADVERTISEMENT
+                </span>
+                <span className={`bg-gradient-to-r ${currentSlide.accentColor} text-white text-xs font-bold px-3 py-1 rounded`}>
+                  {currentSlide.badge}
+                </span>
               </div>
-              <h3 className="text-white font-bold text-base sm:text-xl md:text-2xl tracking-tight">
-                {currentSlide.headline}
-              </h3>
+
+              {/* Headline */}
+              <div className="flex items-center gap-2">
+                <div className={`p-2 rounded bg-gradient-to-r ${currentSlide.accentColor} text-white`}>
+                  {currentSlide.icon}
+                </div>
+                <h3 className="text-white font-bold text-lg sm:text-xl md:text-2xl drop-shadow-lg">
+                  {currentSlide.headline}
+                </h3>
+              </div>
+
+              {/* Offer */}
+              <p className={`text-2xl sm:text-3xl font-bold ${currentSlide.accentColor.includes('orange') ? 'text-orange-300' : 
+                            currentSlide.accentColor.includes('cyan') ? 'text-cyan-300' : 
+                            'text-purple-300'} drop-shadow-lg`}>
+                {currentSlide.offer}
+              </p>
             </div>
 
-            {/* Offer - Big and attention grabbing */}
-            <p className={`text-2xl sm:text-3xl md:text-4xl font-black bg-linear-to-r ${currentSlide.accentColor} bg-clip-text text-transparent drop-shadow-lg`}>
-              {currentSlide.offer}
-            </p>
-          </div>
-
-          {/* CTA Button */}
-          <div className="hidden sm:block">
+            {/* CTA Button */}
             <a
               href={currentSlide.ctaUrl}
-              className={`relative inline-flex items-center gap-2 bg-linear-to-r ${currentSlide.accentColor} text-white font-bold text-sm md:text-base px-6 md:px-8 py-3 md:py-4 rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300`}
+              className={`inline-flex items-center gap-2 bg-gradient-to-r ${currentSlide.accentColor} text-white font-bold text-sm sm:text-base px-5 sm:px-6 py-3 rounded-lg hover:opacity-90 transition-opacity whitespace-nowrap`}
             >
-              <Zap className="w-4 h-4 animate-pulse" />
+              <Zap className="w-4 h-4" />
               {currentSlide.ctaText}
             </a>
           </div>
         </div>
 
-        {/* Mobile CTA */}
-        <div className="sm:hidden px-4 pb-4">
-          <a
-            href={currentSlide.ctaUrl}
-            className={`flex items-center justify-center gap-2 w-full bg-linear-to-r ${currentSlide.accentColor} text-white font-bold text-sm py-3 rounded-lg`}
-          >
-            <Zap className="w-4 h-4" />
-            {currentSlide.ctaText}
-          </a>
-        </div>
-
-        {/* Navigation Arrows */}
+        {/* Navigation */}
         <button
           onClick={prevSlide}
-          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/80 text-white p-1.5 sm:p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/70 text-white p-2 rounded-full"
         >
-          <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+          <ChevronLeft className="w-5 h-5" />
         </button>
         <button
           onClick={nextSlide}
-          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/80 text-white p-1.5 sm:p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/70 text-white p-2 rounded-full"
         >
-          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+          <ChevronRight className="w-5 h-5" />
         </button>
 
         {/* Progress dots */}
-        <div className="absolute bottom-2 sm:bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 sm:gap-2">
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
           {promoSlides.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setCurrentIndex(idx)}
-              className={`h-1 sm:h-1.5 rounded-full transition-all duration-300 ${
-                idx === currentIndex 
-                  ? `w-6 sm:w-8 bg-linear-to-r ${currentSlide.accentColor}` 
-                  : 'w-1.5 sm:w-2 bg-white/30 hover:bg-white/50'
-              }`}
+              className={`h-2 rounded-full transition-all ${idx === currentIndex 
+                ? 'w-6 bg-white' 
+                : 'w-2 bg-white/50 hover:bg-white/70'}`}
             />
           ))}
         </div>

@@ -19,7 +19,7 @@ const sidePromos: SidePromo[] = [
     image: promoHosting,
     badge: '🚀 BEST SELLER',
     headline: 'Launch Your Business Website Today!',
-    offer: 'From RWF 5,000/month - **Grab Our Best Deal Now!**',
+    offer: 'From RWF 5,000/month',
     ctaText: 'GET STARTED',
     ctaUrl: 'https://wa.me/+250787462384',
     countdown: '48:00:00',
@@ -29,7 +29,7 @@ const sidePromos: SidePromo[] = [
     image: promoHosting,
     badge: '💡 SPECIAL OFFER',
     headline: 'Transform Your Business with E-Commerce',
-    offer: 'Only RWF 300,000! Limited Time Offer - Act Fast!',
+    offer: 'Only RWF 300,000!',
     ctaText: 'CLAIM NOW',
     ctaUrl: 'https://wa.me/+250787462384',
     countdown: '24:00:00',
@@ -39,139 +39,128 @@ const sidePromos: SidePromo[] = [
     image: promoHosting,
     badge: '💡 SPECIAL OFFER',
     headline: 'Custom E-Commerce App Development',
-    offer: 'Only RWF 400,000 – Get a Free Consultation!',
+    offer: 'Only RWF 400,000',
     ctaText: 'CLAIM NOW',
     ctaUrl: 'https://wa.me/+250787462384',
     countdown: '24:00:00',
   },
 ];
 
-
 const SidePromoCard = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
-    if (isHovered) return;
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % sidePromos.length);
     }, 6000);
     return () => clearInterval(interval);
-  }, [isHovered]);
+  }, []);
 
   const currentPromo = sidePromos[currentIndex];
 
   return (
-    <div className="space-y-3">
-      {/* Main Ad Card */}
-      <div 
-        className="relative rounded-xl overflow-hidden group cursor-pointer"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        {/* Animated border */}
-        <div className="absolute -inset-[2px] bg-linear-to-r from-yellow-400 via-orange-500 to-red-500 rounded-xl opacity-80 group-hover:opacity-100 transition-opacity animate-pulse" />
-        
-        <div className="relative bg-black rounded-xl overflow-hidden">
-          {/* Image */}
-          <div className="relative">
-            <img
-              src={currentPromo.image}
-              alt={currentPromo.headline}
-              className="w-full h-32 sm:h-40 object-cover opacity-50 group-hover:opacity-60 group-hover:scale-105 transition-all duration-500"
-            />
-            <div className="absolute inset-0 bg-linear-to-t from-black via-black/60 to-transparent" />
-          </div>
+    <div className="space-y-4">
+      {/* Main Ad Card with proper height */}
+      <div className="relative rounded-lg overflow-hidden min-h-[280px] sm:min-h-[300px]">
+        {/* Image */}
+        <div className="absolute inset-0">
+          <img
+            src={currentPromo.image}
+            alt={currentPromo.headline}
+            className="w-full h-full object-cover"
+          />
+          {/* Gradient overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+        </div>
 
-          {/* Floating badge */}
-          {/* <div className="absolute top-2 left-2 right-2 flex items-center justify-between">
-            <span className="bg-black/60 backdrop-blur-sm text-white/70 text-[8px] sm:text-[9px] font-medium px-2 py-0.5 rounded border border-white/10">
-              SPONSORED
-            </span>
-            <span className="bg-linear-to-r from-yellow-500 to-orange-500 text-black text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full animate-bounce">
-              {currentPromo.badge}
-            </span>
-          </div> */}
-
-          {/* Content */}
-          <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 space-y-2">
-            {/* Countdown timer */}
+        {/* Content with proper padding */}
+        <div className="relative h-full p-4 sm:p-5 md:p-6 flex flex-col justify-end">
+          <div className="space-y-3">
+            {/* Countdown */}
             {currentPromo.countdown && (
-              <div className="flex items-center gap-1.5 text-orange-400">
-                <Clock className="w-3 h-3 animate-pulse" />
-                <span className="text-[10px] sm:text-xs font-mono font-bold">
-                  Ends in: {currentPromo.countdown}
+              <div className="flex items-center gap-2 text-orange-300 bg-black/30 px-2 py-1 rounded">
+                <Clock className="w-4 h-4" />
+                <span className="text-xs font-bold">
+                  Ends in: <span className="text-white">{currentPromo.countdown}</span>
                 </span>
               </div>
             )}
 
-            <p className="text-white/80 text-[10px] sm:text-xs font-semibold tracking-widest">
+            {/* Headline */}
+            <h3 className="text-white font-bold text-base sm:text-lg md:text-xl drop-shadow-lg">
               {currentPromo.headline}
-            </p>
+            </h3>
             
-            <p className="text-xl sm:text-2xl md:text-3xl font-black bg-linear-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+            {/* Offer */}
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-orange-300 drop-shadow-lg">
               {currentPromo.offer}
             </p>
 
+            {/* Badge */}
+            <div className="mb-3">
+              <span className="inline-block bg-gradient-to-r from-yellow-500 to-orange-500 text-black text-xs font-bold px-3 py-1 rounded">
+                {currentPromo.badge}
+              </span>
+            </div>
+
+            {/* CTA Button */}
             <a
               href={currentPromo.ctaUrl}
-              className="flex items-center justify-center gap-2 w-full bg-linear-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-black font-bold text-xs sm:text-sm py-2.5 sm:py-3 rounded-lg transition-all hover:scale-[1.02] hover:shadow-lg hover:shadow-orange-500/30"
+              className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-bold text-sm py-3 rounded hover:opacity-90 transition-opacity"
             >
               <Sparkles className="w-4 h-4" />
               {currentPromo.ctaText}
               <ArrowRight className="w-4 h-4" />
             </a>
           </div>
+        </div>
 
-          {/* Dots */}
-          <div className="absolute bottom-16 sm:bottom-20 left-1/2 -translate-x-1/2 flex gap-1.5">
-            {sidePromos.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setCurrentIndex(idx)}
-                className={`h-1 rounded-full transition-all ${
-                  idx === currentIndex 
-                    ? 'w-4 bg-linear-to-r from-yellow-400 to-orange-500' 
-                    : 'w-1 bg-white/30 hover:bg-white/50'
-                }`}
-              />
-            ))}
-          </div>
+        {/* Progress dots */}
+        <div className="absolute top-4 right-4 flex gap-2">
+          {sidePromos.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentIndex(idx)}
+              className={`h-2 rounded-full ${idx === currentIndex 
+                ? 'w-4 bg-white' 
+                : 'w-2 bg-white/50'}`}
+            />
+          ))}
         </div>
       </div>
 
-      {/* Quick Link Ads */}
-      <div className="hidden sm:flex flex-col gap-2">
+      {/* Simple Text Ads with better spacing */}
+      {/* <div className="space-y-3">
         <a 
           href="#visit"
-          className="group relative overflow-hidden rounded-lg border border-yellow-500/30 bg-linear-to-r from-yellow-500/10 to-orange-500/10 p-3 hover:border-yellow-500/60 transition-all"
+          className="block bg-gray-900/80 border border-gray-700 rounded-lg p-4 hover:border-yellow-500/50 transition-colors"
         >
-          <div className="absolute top-0 right-0 bg-yellow-500/20 text-yellow-400 text-[8px] font-bold px-1.5 py-0.5 rounded-bl">
-            AD
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-yellow-400 text-xs font-bold bg-yellow-400/10 px-2 py-0.5 rounded">AD</span>
+            <ArrowRight className="w-3 h-3 text-gray-400" />
           </div>
-          <p className="text-xs text-muted-foreground">
-            <span className="text-yellow-500 font-bold">AgasobanuyeTimes.space</span>
-            <span className="mx-1">•</span>
+          <p className="text-white text-sm">
+            <span className="font-bold">AgasobanuyeTimes.space</span>
+            <span className="mx-2 text-gray-400">•</span>
             Your #1 Entertainment Hub
-            <ArrowRight className="inline w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform" />
           </p>
         </a>
 
         <a 
           href="#support"
-          className="group relative overflow-hidden rounded-lg border border-cyan-500/30 bg-linear-to-r from-cyan-500/10 to-blue-500/10 p-3 hover:border-cyan-500/60 transition-all"
+          className="block bg-gray-900/80 border border-gray-700 rounded-lg p-4 hover:border-cyan-500/50 transition-colors"
         >
-          <div className="absolute top-0 right-0 bg-cyan-500/20 text-cyan-400 text-[8px] font-bold px-1.5 py-0.5 rounded-bl">
-            AD
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-cyan-400 text-xs font-bold bg-cyan-400/10 px-2 py-0.5 rounded">AD</span>
+            <ArrowRight className="w-3 h-3 text-gray-400" />
           </div>
-          <p className="text-xs text-muted-foreground">
-            <span className="text-cyan-400 font-bold">24/7 IT Support</span>
-            <span className="mx-1">•</span>
+          <p className="text-white text-sm">
+            <span className="font-bold">24/7 IT Support</span>
+            <span className="mx-2 text-gray-400">•</span>
             Remote & On-site Help
-            <ArrowRight className="inline w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform" />
           </p>
         </a>
-      </div>
+      </div> */}
     </div>
   );
 };

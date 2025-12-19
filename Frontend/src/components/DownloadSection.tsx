@@ -131,9 +131,9 @@ const DownloadSection = ({ externalUrl, movieId, title }: DownloadSectionProps) 
     toast.info("Download cancelled");
   };
 
-  const handleReturnHome = () => {
-    window.location.href = externalUrl;
-  };
+  // const handleReturnHome = () => {
+  //   window.location.href = externalUrl;
+  // };
   
 
   return (
@@ -179,7 +179,7 @@ const DownloadSection = ({ externalUrl, movieId, title }: DownloadSectionProps) 
           Cancel
         </Button>
         
-        <Button 
+        {/* <Button 
           variant="secondary" 
           size="lg" 
           className="flex-1 sm:flex-none sm:w-auto min-h-8 cursor-pointer"
@@ -187,12 +187,12 @@ const DownloadSection = ({ externalUrl, movieId, title }: DownloadSectionProps) 
         >
           <Home className="w-5 h-5 mr-2" />
           Return Home
-        </Button>
+        </Button> */}
       </div>
 
       {/* Alternative Download Options */}
       <div className="glass-card-subtle rounded-xl p-4">
-        <p className="text-sm text-muted-foreground mb-3">Having trouble downloading? Try these options:</p>
+        <p className="text-sm text-muted-foreground mb-3">Niba download iri kwanga gerageze iyi option:</p>
         <div className="flex flex-wrap gap-3">
           {/* <Button 
             variant="default" 

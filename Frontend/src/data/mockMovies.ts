@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || "https://agasobanuye-yrqs.onrender.com/api";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://agasobanuye-yrqs.onrender.com/api"; 
 export interface Movie {
   _id: string;
   title: string;
