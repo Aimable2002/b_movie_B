@@ -18,18 +18,16 @@ const FullScreenAdModal = ({
   showCancel = true
 }: FullScreenAdModalProps) => {
   const [timeLeft, setTimeLeft] = useState(duration);
-  const [adLoaded, setAdLoaded] = useState(false);
   const [showSkip, setShowSkip] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const skipTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const skipTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Countdown timer
   useEffect(() => {
     if (timeLeft > 0) {
       timerRef.current = setInterval(() => {
         setTimeLeft(prev => {
           if (prev <= 1) {
-            clearInterval(timerRef.current as NodeJS.Timeout);
+            if (timerRef.current) clearInterval(timerRef.current);
             setShowSkip(true);
             return 0;
           }
@@ -43,6 +41,7 @@ const FullScreenAdModal = ({
       if (skipTimeoutRef.current) clearTimeout(skipTimeoutRef.current);
     };
   }, []);
+
 
   // Allow skip after duration
   useEffect(() => {

@@ -1,8 +1,8 @@
 // Watch.tsx - Updated version
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, AlertCircle } from "lucide-react";
-import { useAdContext } from "@/context/AdContext";
+import { useAdContext } from "@/contexts/AdContext";
 import FullScreenAdModal from "@/components/ads/FullScreenAdModal";
 
 interface movieProp {
@@ -39,9 +39,9 @@ const Watch = ({ url }: movieProp) => {
     }
   };
 
-  const handleAdCancel = () => {
-    navigate(-1);
-  };
+  // const handleAdCancel = () => {
+  //   navigate(-1);
+  // };
 
   const handleRetry = () => {
     setVideoStarted(false);

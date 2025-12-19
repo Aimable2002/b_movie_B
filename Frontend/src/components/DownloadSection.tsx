@@ -6,7 +6,7 @@ import ProgressBar from "./ProgressBar";
 import { toast } from "sonner";
 import { getDownloadUrl } from "../data/mockMovies";
 import { useNavigate } from "react-router-dom";
-import { useAdContext } from "@/context/AdContext";
+import { useAdContext } from "@/contexts/AdContext";
 import FullScreenAdModal from "@/components/ads/FullScreenAdModal";
 
 interface DownloadSectionProps {
@@ -30,7 +30,6 @@ const DownloadSection = ({ externalUrl, movieId, title }: DownloadSectionProps) 
     currentAdType, 
     onAdComplete, 
     onAdCancel,
-    adCount 
   } = useAdContext();
 
   useEffect(() => {
