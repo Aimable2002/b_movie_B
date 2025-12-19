@@ -291,15 +291,19 @@ const FullScreenAdModal = ({
               </div>
             </a>
 
-            <div className="flex items-center p-3 bg-blue-600/20 border border-blue-500/30 rounded-lg">
+            <a
+              href="tel:+250788484589"
+              className="flex items-center p-3 bg-blue-600/20 border border-blue-500/30 rounded-lg"
+            >
               <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center mr-3">
                 <Phone className="w-5 h-5 text-white" />
               </div>
               <div>
                 <p className="font-bold text-white">Call Us</p>
-                <p className="text-sm text-gray-300">+250 787 462 384</p>
+                <p className="text-sm text-gray-300">+250 788 484 589</p>
               </div>
-            </div>
+            </a>
+
 
             {/* <a 
               href="https://reuble.com" 
