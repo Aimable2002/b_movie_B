@@ -1,5 +1,5 @@
 // Watch.tsx
-import { useState } from "react";
+import {  useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, AlertCircle, Play } from "lucide-react";
 import { useAdContext } from "@/contexts/AdContext";
@@ -22,7 +22,6 @@ const Watch = ({ url }: movieProp) => {
     isShowingAd, 
     currentAdType, 
     onAdComplete, 
-    onAdCancel 
   } = useAdContext();
 
   const startVideo = async () => {
@@ -67,7 +66,7 @@ const Watch = ({ url }: movieProp) => {
         // SHOW VIDEO PREVIEW WITH "WATCH NOW" BUTTON
         <div className="flex-1 flex flex-col items-center justify-center px-4 py-6">
           <div className="text-center max-w-md">
-            <div className="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-gray-900 to-black rounded-xl border border-gray-800 flex items-center justify-center">
+            <div className="w-32 h-32 mx-auto mb-6 bg-linear-to-br from-gray-900 to-black rounded-xl border border-gray-800 flex items-center justify-center">
               <Play className="w-16 h-16 text-gray-400" />
             </div>
             <h3 className="text-xl font-bold mb-4">Ready to Watch?</h3>
@@ -76,7 +75,7 @@ const Watch = ({ url }: movieProp) => {
             </p>
             <Button
               onClick={startVideo}
-              className="px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg hover:opacity-90 transition-opacity text-lg"
+              className="px-8 py-3 bg-linear-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg hover:opacity-90 transition-opacity text-lg"
               disabled={isShowingAd}
               size="lg"
             >
