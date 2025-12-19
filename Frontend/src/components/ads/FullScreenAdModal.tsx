@@ -1,3 +1,4 @@
+// components/ads/FullScreenAdModal.tsx - FIXED VERSION
 import { useEffect, useState, useRef } from "react";
 import { X, Loader2, Clock, Check, Zap, Code, Server, Cpu, Mail, Phone } from "lucide-react";
 
@@ -33,6 +34,7 @@ const FullScreenAdModal = ({
   const adInstanceRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const isMounted = useRef(true);
+  const adCheckInterval = useRef<number | null>(null);
 
   useEffect(() => {
     const updateHeight = () => {
@@ -48,6 +50,31 @@ const FullScreenAdModal = ({
     
     return () => window.removeEventListener('resize', updateHeight);
   }, [showFallback]);
+
+  const showFallbackAd = () => {
+    if (!isMounted.current) return;
+    
+    if (adInstanceRef.current && adInstanceRef.current.parentNode) {
+      try {
+        adInstanceRef.current.parentNode.removeChild(adInstanceRef.current);
+      } catch (err) {}
+    }
+    
+    if (adCheckInterval.current) {
+      clearInterval(adCheckInterval.current);
+    }
+    
+    setShowFallback(true);
+    setAdLoaded(true);
+  };
+
+  const checkAdLoaded = () => {
+    const container = adContainerRef.current;
+    if (!container) return false;
+    
+    const hasAdContent = container.querySelector('iframe, img, video, .adsbygoogle > *');
+    return !!hasAdContent;
+  };
 
   useEffect(() => {
     isMounted.current = true;
@@ -65,82 +92,76 @@ const FullScreenAdModal = ({
       }
     }, 1000);
 
-    const showFallbackAd = () => {
-      if (!isMounted.current) return;
-      setShowFallback(true);
-      setAdLoaded(true);
-    };
-
     const loadAdSenseAd = () => {
       const container = adContainerRef.current;
       if (!container || !isMounted.current) return;
 
-      const useDevelopmentFallback = window.location.hostname === 'localhost' || 
-                                    window.location.hostname.includes('127.0.0.1') ||
-                                    !(window as any).adsbygoogle;
+      const shouldSkipAdSense = 
+        window.location.hostname.includes('localhost') ||
+        window.location.hostname.includes('127.0.0.1') ||
+        window.location.hostname.includes('render.com') ||
+        !(window as any).adsbygoogle;
 
-      if (useDevelopmentFallback) {
+      if (shouldSkipAdSense) {
         setTimeout(() => {
-          if (isMounted.current) {
-            showFallbackAd();
-          }
-        }, 1000);
+          if (isMounted.current) showFallbackAd();
+        }, 800);
         return;
       }
 
       try {
-        if ((window as any).adsbygoogle) {
-          const adWrapper = document.createElement('div');
-          adWrapper.id = `adsense-wrapper-${Date.now()}`;
-          adWrapper.style.width = '100%';
-          adWrapper.style.height = '100%';
-          adWrapper.style.position = 'relative';
-          adWrapper.style.minHeight = '350px';
-          
-          const adElement = document.createElement('ins');
-          adElement.className = 'adsbygoogle';
-          adElement.style.display = 'block';
-          adElement.style.width = '100%';
-          adElement.style.height = '100%';
-          adElement.style.overflow = 'hidden';
-          adElement.style.borderRadius = '0.5rem';
-          
-          adElement.setAttribute('data-ad-client', 'ca-pub-6077829775020531');
-          adElement.setAttribute('data-ad-slot', 'YOUR_AD_SLOT_ID');
-          adElement.setAttribute('data-ad-format', 'auto');
-          adElement.setAttribute('data-full-width-responsive', 'true');
-          
-          adWrapper.appendChild(adElement);
-          container.appendChild(adWrapper);
-          adInstanceRef.current = adWrapper;
+        const adWrapper = document.createElement('div');
+        adWrapper.id = `adsense-wrapper-${Date.now()}`;
+        adWrapper.style.width = '100%';
+        adWrapper.style.height = '100%';
+        adWrapper.style.position = 'relative';
+        adWrapper.style.minHeight = '350px';
+        
+        const adElement = document.createElement('ins');
+        adElement.className = 'adsbygoogle';
+        adElement.style.display = 'block';
+        adElement.style.width = '100%';
+        adElement.style.height = '100%';
+        adElement.style.overflow = 'hidden';
+        adElement.style.borderRadius = '0.5rem';
+        
+        adElement.setAttribute('data-ad-client', 'ca-pub-6077829775020531');
+        adElement.setAttribute('data-ad-slot', 'YOUR_AD_SLOT_ID');
+        adElement.setAttribute('data-ad-format', 'auto');
+        adElement.setAttribute('data-full-width-responsive', 'true');
+        
+        adWrapper.appendChild(adElement);
+        container.appendChild(adWrapper);
+        adInstanceRef.current = adWrapper;
 
-          try {
-            (window as any).adsbygoogle.push({});
-            
-            setTimeout(() => {
-              if (isMounted.current) {
-                const container = adContainerRef.current;
-                if (container) {
-                  const hasAd = container.querySelector('iframe, img, div[class*="ad"]');
-                  if (!hasAd) {
-                    showFallbackAd();
-                  } else {
-                    setAdLoaded(true);
-                  }
-                } else {
-                  showFallbackAd();
-                }
+        try {
+          (window as any).adsbygoogle.push({});
+          
+          let checks = 0;
+          const maxChecks = 10;
+          
+          adCheckInterval.current = window.setInterval(() => {
+            if (!isMounted.current || checks >= maxChecks) {
+              if (adCheckInterval.current) {
+                clearInterval(adCheckInterval.current);
               }
-            }, 3000);
-          } catch (adError) {
-            showFallbackAd();
-          }
-        } else {
-          setTimeout(() => {
-            if (isMounted.current) {
+              return;
+            }
+            
+            checks++;
+            
+            if (checkAdLoaded()) {
+              if (adCheckInterval.current) {
+                clearInterval(adCheckInterval.current);
+              }
+              setAdLoaded(true);
+            } else if (checks >= maxChecks) {
               showFallbackAd();
             }
-          }, 1500);
+          }, 500);
+          
+        } catch (adError) {
+          showFallbackAd();
         }
       } catch (error) {
         showFallbackAd();
@@ -158,6 +179,10 @@ const FullScreenAdModal = ({
       
       if (loadTimer) {
         clearTimeout(loadTimer);
+      }
+      
+      if (adCheckInterval.current) {
+        clearInterval(adCheckInterval.current);
       }
       
       if (adInstanceRef.current && adInstanceRef.current.parentNode) {
@@ -266,18 +291,15 @@ const FullScreenAdModal = ({
               </div>
             </a>
 
-            <a
-              href="tel:+250788484589"
-              className="flex items-center p-3 bg-blue-600/20 border border-blue-500/30 rounded-lg"
-            >
+            <div className="flex items-center p-3 bg-blue-600/20 border border-blue-500/30 rounded-lg">
               <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center mr-3">
                 <Phone className="w-5 h-5 text-white" />
               </div>
               <div>
                 <p className="font-bold text-white">Call Us</p>
-                <p className="text-sm text-gray-300">+250 788 484 589</p>
+                <p className="text-sm text-gray-300">+250 787 462 384</p>
               </div>
-            </a>
+            </div>
 
             {/* <a 
               href="https://reuble.com" 
