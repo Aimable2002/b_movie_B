@@ -1,10 +1,13 @@
+// DownloadSection.tsx - Updated version
 import { useState, useEffect } from "react";
-import { Download, X, Zap} from "lucide-react";  // Home,
+import { Download, X, Zap, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProgressBar from "./ProgressBar";
 import { toast } from "sonner";
 import { getDownloadUrl } from "../data/mockMovies";
 import { useNavigate } from "react-router-dom";
+import { useAdContext } from "@/context/AdContext";
+import FullScreenAdModal from "@/components/ads/FullScreenAdModal";
 
 interface DownloadSectionProps {
   downloadUrl: string;
@@ -18,7 +21,18 @@ const DownloadSection = ({ externalUrl, movieId, title }: DownloadSectionProps) 
   const [isDownloading, setIsDownloading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [downloadComplete, setDownloadComplete] = useState(false);
-console.log(externalUrl)
+  const [buttonAdCount, setButtonAdCount] = useState(0);
+  const navigate = useNavigate();
+  
+  const { 
+    showFullScreenAd, 
+    isShowingAd, 
+    currentAdType, 
+    onAdComplete, 
+    onAdCancel,
+    adCount 
+  } = useAdContext();
+
   useEffect(() => {
     if (isDownloading && !downloadComplete) {
       const duration = 2000;
@@ -33,9 +47,7 @@ console.log(externalUrl)
           setProgress(100);
           clearInterval(timer);
           setDownloadComplete(true);
-          toast.success("Download complete!", {
-            description: title || "File ready"
-          });
+          toast.success("Download complete!");
         } else {
           setProgress(currentProgress);
         }
@@ -43,19 +55,34 @@ console.log(externalUrl)
 
       return () => clearInterval(timer);
     }
-  }, [isDownloading, downloadComplete, title]);
+  }, [isDownloading, downloadComplete]);
 
   const handleDownload = async () => {
+    // Show 3 ads before download
+    if (buttonAdCount < 3) {
+      const adShown = await showFullScreenAd('button');
+      if (adShown) {
+        setButtonAdCount(prev => prev + 1);
+        if (buttonAdCount + 1 === 3) {
+          // After 3 ads, start download
+          startDownload();
+        } else {
+          toast.info(`Watch ${3 - (buttonAdCount + 1)} more ads to download`);
+        }
+      }
+    } else {
+      startDownload();
+    }
+  };
+
+  const startDownload = async () => {
     setIsDownloading(true);
     setProgress(0);
     setDownloadComplete(false);
-    toast.info("Starting download...");
     
     try {
-      // Get the download URL from backend
       const url = await getDownloadUrl(movieId);
       if (url) {
-        // Create a temporary anchor to trigger download
         const link = document.createElement('a');
         link.href = url;
         link.download = title || 'movie';
@@ -63,6 +90,7 @@ console.log(externalUrl)
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        toast.info("Download started!");
       }
     } catch (error) {
       console.error("Error getting download URL:", error);
@@ -70,59 +98,32 @@ console.log(externalUrl)
     }
   };
 
-  // const handleDirectDownload = async () => {
-  //   try {
-  //     const url = await getDownloadUrl(movieId);
-  //     if (url) {
-  //       window.open(url, '_blank');
-  //       toast.success("Direct download started!", {
-  //         description: title || "File downloading..."
-  //       });
-  //     }
-  //   } catch (error) {
-  //     console.error("Error getting download URL:", error);
-  //     toast.error("Failed to get download URL");
-  //   }
-  // };
+  const handleWatchNow = async () => {
+    // Show 1 ad for video
+    const adShown = await showFullScreenAd('video');
+    if (adShown) {
+      navigate(`/watch/${movieId}`);
+    } else {
+      toast.info("Please complete the ad to watch");
+    }
+  };
 
-
-  // const handleDirectDownload = async () => {
-  //   try {
-  //     const downloadUrl = `/api/movie/direct/download?url=${encodeURIComponent(movieId)}`;
-  //     const link = document.createElement("a");
-  //     link.href = downloadUrl;
-  //     link.setAttribute("download", "movie.mp4");
-  //     document.body.appendChild(link);
-  //     link.click();
-  //     link.remove();
-  //     toast.success("Direct download started!");
-  //   } catch (err) {
-  //     console.error(err);
-  //     toast.error("Failed to start download");
-  //   }
-  // };
-  
-
-
-  const navigate = useNavigate();
-
-  // const handleWatchNow = () => {
-  //   navigate(`/watch/${movieId}`);
-  // };
-
-  // const handleWatchNow = async () => {
-  //   try {
-  //     const url = await getStreamUrl(movieId);
-  //     if (url) {
-  //       window.open(url, '_blank');
-  //       toast.info("Opening streaming player...");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error getting stream URL:", error);
-  //     toast.error("Failed to get stream URL");
-  //   }
-  // };
-
+  const handleAssistedDownload = async () => {
+    // Show 3 ads for assisted download
+    if (buttonAdCount < 3) {
+      const adShown = await showFullScreenAd('button');
+      if (adShown) {
+        setButtonAdCount(prev => prev + 1);
+        if (buttonAdCount + 1 === 3) {
+          window.open('https://wa.me/+250788484589', '_blank');
+        } else {
+          toast.info(`Watch ${3 - (buttonAdCount + 1)} more ads for assistance`);
+        }
+      }
+    } else {
+      window.open('https://wa.me/+250788484589', '_blank');
+    }
+  };
 
   const handleCancel = () => {
     setIsDownloading(false);
@@ -131,108 +132,139 @@ console.log(externalUrl)
     toast.info("Download cancelled");
   };
 
-  // const handleReturnHome = () => {
-  //   window.location.href = externalUrl;
-  // };
-  
+  const handleOpenExternal = async () => {
+    // Show 3 ads for external link
+    if (buttonAdCount < 3) {
+      const adShown = await showFullScreenAd('button');
+      if (adShown) {
+        setButtonAdCount(prev => prev + 1);
+        if (buttonAdCount + 1 === 3) {
+          window.open(externalUrl, '_blank');
+        } else {
+          toast.info(`Watch ${3 - (buttonAdCount + 1)} more ads to open`);
+        }
+      }
+    } else {
+      window.open(externalUrl, '_blank');
+    }
+  };
 
   return (
-    <div className="glass-card rounded-2xl p-6 md:p-8 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-      <ProgressBar 
-        isAnimating={isDownloading} 
-        progress={progress} 
-        className="mb-6"
-      />
-      
-      {/* Main Action Buttons */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
-        <Button 
-          variant="default" 
-          size="lg" 
-          className="flex-1 min-h-8 cursor-pointer"
-          onClick={handleDownload}
-          disabled={isDownloading}
-        >
-          <Download className="w-5 h-5 mr-2" />
-          {isDownloading ? "Downloading..." : downloadComplete ? "Download Again" : "Download Now"}
-        </Button>
-        
-        {/* <Button 
-          variant="default" 
-          size="lg" 
-          className="flex-1 min-h-8"
-          onClick={handleWatchNow}
-          disabled={isDownloading}
-        >
-          <Play className="w-5 h-5 mr-2" />
-          Watch Now
-        </Button> */}
-        
-        <Button 
-          variant="outline" 
-          size="lg" 
-          className="flex-1 sm:flex-none sm:w-auto min-h-8 cursor-pointer"
-          onClick={handleCancel}
-          disabled={!isDownloading}
-        >
-          <X className="w-5 h-5 mr-2" />
-          Cancel
-        </Button>
-        
-        {/* <Button 
-          variant="secondary" 
-          size="lg" 
-          className="flex-1 sm:flex-none sm:w-auto min-h-8 cursor-pointer"
-          onClick={handleReturnHome}
-        >
-          <Home className="w-5 h-5 mr-2" />
-          Return Home
-        </Button> */}
-      </div>
+    <>
+      {/* Full Screen Ad Modal */}
+      {isShowingAd && (
+        <FullScreenAdModal
+          onComplete={onAdComplete}
+          onCancel={onAdCancel}
+          adTitle={
+            currentAdType === 'video' ? "Watch Video" : "Advertisement"
+          }
+          duration={currentAdType === 'video' ? 10 : 15}
+          showCancel={false}
+        />
+      )}
 
-      {/* Alternative Download Options */}
-      <div className="glass-card-subtle rounded-xl p-4">
-        <p className="text-sm text-muted-foreground mb-3">Niba download iri kwanga gerageze iyi option:</p>
-        <div className="flex flex-wrap gap-3">
-          {/* <Button 
+      <div className="glass-card rounded-2xl p-6 md:p-8 animate-fade-in-up">
+        {/* Ad Counter Display */}
+        <div className="mb-4 p-3 bg-gray-900/50 rounded-lg">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-400">Ads watched for buttons:</span>
+            <span className="text-lg font-bold text-white">
+              {buttonAdCount}/3
+            </span>
+          </div>
+          <div className="w-full h-2 bg-gray-800 rounded-full mt-1 overflow-hidden">
+            <div 
+              className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300"
+              style={{ width: `${(buttonAdCount / 3) * 100}%` }}
+            />
+          </div>
+          {buttonAdCount < 3 && (
+            <p className="text-xs text-amber-400 mt-1">
+              Click any button to watch ads ({3 - buttonAdCount} more needed)
+            </p>
+          )}
+        </div>
+
+        <ProgressBar 
+          isAnimating={isDownloading} 
+          progress={progress} 
+          className="mb-6"
+        />
+        
+        {/* Main Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          <Button 
             variant="default" 
-            size="sm"
-            onClick={handleDirectDownload}
+            size="lg"
+            className="flex-1 min-h-8 cursor-pointer"
+            onClick={handleDownload}
+            disabled={isDownloading || isShowingAd}
           >
-            Direct Download
-          </Button> */}
-          {/* <Button 
-            variant="outline" 
-            size="sm"
-            onClick={handleWatchNow}
-          >
-            <Play className="w-4 h-4 mr-2" />
-            Stream Now
+            <Download className="w-5 h-5 mr-2" />
+            {isDownloading ? "Downloading..." : `Download Now (${3 - buttonAdCount} ads)`}
           </Button>
+          
+          <Button 
+            variant="secondary" 
+            size="lg"
+            className="flex-1 min-h-8 cursor-pointer"
+            onClick={handleWatchNow}
+            disabled={isShowingAd}
+          >
+            <Play className="w-5 h-5 mr-2" />
+            Watch Now (1 ad)
+          </Button>
+          
           <Button 
             variant="outline" 
-            size="sm"
-            onClick={handleOpenInNewTab}
+            size="lg"
+            className="flex-1 sm:flex-none sm:w-auto min-h-8 cursor-pointer"
+            onClick={handleCancel}
+            disabled={!isDownloading}
           >
-            <ExternalLink className="w-4 h-4 mr-2" />
-            Open in New Tab
-          </Button> */}
-          <Button 
-            variant="default" 
-            size="sm"
-            onClick={() => navigate('https://wa.me/+250788484589')}
-            disabled={isDownloading}
-            className="bg-primary hover:bg-primary/90"
-          >
-            <Zap className="w-4 h-4 mr-2" />
-            Assisted Download
+            <X className="w-5 h-5 mr-2" />
+            Cancel
           </Button>
         </div>
-        <p className="text-xs text-amber-500 mt-3 flex items-center gap-1">
-          <span>⚠</span> Your browser may have issues with large downloads. Use "Assisted Download" for best results.
-        </p>
+
+        {/* Alternative Options */}
+        <div className="glass-card-subtle rounded-xl p-4">
+          <p className="text-sm text-muted-foreground mb-3">
+            Alternative options (3 ads required for each):
+          </p>
+          
+          <div className="flex flex-wrap gap-3">
+            <Button 
+              variant="default" 
+              size="sm"
+              className="bg-primary hover:bg-primary/90"
+              onClick={handleAssistedDownload}
+              disabled={isShowingAd}
+            >
+              <Zap className="w-4 h-4 mr-2" />
+              Assisted Download ({3 - buttonAdCount} ads)
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={handleOpenExternal}
+              disabled={isShowingAd}
+            >
+              Open Original ({3 - buttonAdCount} ads)
+            </Button>
+          </div>
+          
+          <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+            <p className="text-xs text-amber-600 font-medium">
+              ⚠ Important: Each button requires watching {buttonAdCount < 3 ? '3' : 'no more'} advertisements.
+              The "Cancel" button is the only free action.
+            </p>
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
