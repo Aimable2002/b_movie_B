@@ -174,7 +174,7 @@ const DownloadSection = ({ externalUrl, movieId, title }: DownloadSectionProps) 
           </div>
           <div className="w-full h-2 bg-gray-800 rounded-full mt-1 overflow-hidden">
             <div 
-              className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300"
+              className="h-full bg-linear-to-r from-blue-500 to-purple-500 transition-all duration-300"
               style={{ width: `${(buttonAdCount / 3) * 100}%` }}
             />
           </div>
