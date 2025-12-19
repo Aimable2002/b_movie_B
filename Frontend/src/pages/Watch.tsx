@@ -1,9 +1,10 @@
-// Watch.tsx - Updated version
+// Watch.tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle, Play } from "lucide-react";
 import { useAdContext } from "@/contexts/AdContext";
 import FullScreenAdModal from "@/components/ads/FullScreenAdModal";
+import { Button } from "@/components/ui/button";
 
 interface movieProp {
   url: string;
@@ -39,9 +40,9 @@ const Watch = ({ url }: movieProp) => {
     }
   };
 
-  // const handleAdCancel = () => {
-  //   navigate(-1);
-  // };
+  const handleAdCancel = () => {
+    navigate(-1);
+  };
 
   const handleRetry = () => {
     setVideoStarted(false);
@@ -51,11 +52,11 @@ const Watch = ({ url }: movieProp) => {
 
   return (
     <div className="min-h-[40%] bg-[#0d0d0d] text-white flex flex-col">
-      {/* Full Screen Ad Modal for video */}
+      {/* Full Screen Ad Modal for video - ONLY shows when triggered */}
       {isShowingAd && currentAdType === 'video' && (
         <FullScreenAdModal
           onComplete={onAdComplete}
-          onCancel={onAdCancel}
+          onCancel={handleAdCancel}
           adTitle="Watch Video Advertisement"
           duration={10}
           showCancel={false}
@@ -63,29 +64,31 @@ const Watch = ({ url }: movieProp) => {
       )}
 
       {!videoStarted ? (
+        // SHOW VIDEO PREVIEW WITH "WATCH NOW" BUTTON
         <div className="flex-1 flex flex-col items-center justify-center px-4 py-6">
           <div className="text-center max-w-md">
-            <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-2xl">!</span>
+            <div className="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-gray-900 to-black rounded-xl border border-gray-800 flex items-center justify-center">
+              <Play className="w-16 h-16 text-gray-400" />
             </div>
-            <h3 className="text-xl font-bold mb-2">Advertisement Required</h3>
+            <h3 className="text-xl font-bold mb-4">Ready to Watch?</h3>
             <p className="text-gray-400 mb-6">
-              You must watch a full advertisement before the video can play.
-              This supports our free service.
+              Click "Watch Now" to view this video. One advertisement is required to support our free service.
             </p>
-            <button
+            <Button
               onClick={startVideo}
-              className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg hover:opacity-90 transition-opacity"
+              className="px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg hover:opacity-90 transition-opacity text-lg"
               disabled={isShowingAd}
+              size="lg"
             >
-              {isShowingAd ? "Loading Ad..." : "Watch Ad to Play Video"}
-            </button>
+              {isShowingAd ? "Loading Ad..." : "Watch Now (1 Ad Required)"}
+            </Button>
             <div className="text-xs text-gray-500 mt-4">
-              Clicking outside or closing will cancel and go back
+              The ad will play before the video starts
             </div>
           </div>
         </div>
       ) : (
+        // SHOW VIDEO AFTER AD IS COMPLETE
         <div className="flex-1 flex flex-col items-center justify-center px-4 py-6">
           {loading ? (
             <div className="flex flex-col items-center">
@@ -100,18 +103,19 @@ const Watch = ({ url }: movieProp) => {
               <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
               <p className="text-red-400 text-lg mb-3">{error}</p>
               <div className="flex gap-3">
-                <button
+                <Button
                   onClick={() => navigate(-1)}
-                  className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition"
+                  variant="outline"
+                  className="px-4 py-2"
                 >
                   Go Back
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={handleRetry}
-                  className="px-4 py-2 bg-primary rounded-lg hover:bg-primary/80 transition"
+                  className="px-4 py-2"
                 >
                   Retry (Watch Ad Again)
-                </button>
+                </Button>
               </div>
             </div>
           ) : streamUrl ? (
@@ -131,12 +135,13 @@ const Watch = ({ url }: movieProp) => {
                 <p className="text-gray-400 text-sm">
                   Want to watch another video? You'll need to watch another advertisement first.
                 </p>
-                <button
+                <Button
                   onClick={handleRetry}
-                  className="mt-3 px-4 py-2 bg-primary/20 text-primary rounded-lg hover:bg-primary/30 transition"
+                  variant="outline"
+                  className="mt-3"
                 >
                   Watch Another (Ad Required)
-                </button>
+                </Button>
               </div>
             </div>
           ) : null}
