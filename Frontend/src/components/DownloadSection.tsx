@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Download, X, Home, Zap} from "lucide-react";
+import { Download, X, Zap} from "lucide-react";  // Home,
 import { Button } from "@/components/ui/button";
 import ProgressBar from "./ProgressBar";
 import { toast } from "sonner";
@@ -18,7 +18,7 @@ const DownloadSection = ({ externalUrl, movieId, title }: DownloadSectionProps) 
   const [isDownloading, setIsDownloading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [downloadComplete, setDownloadComplete] = useState(false);
-
+console.log(externalUrl)
   useEffect(() => {
     if (isDownloading && !downloadComplete) {
       const duration = 2000;
