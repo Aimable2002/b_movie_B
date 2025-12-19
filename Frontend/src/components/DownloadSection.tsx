@@ -1,11 +1,11 @@
 // DownloadSection.tsx - Updated version
 import { useState, useEffect } from "react";
-import { Download, X, Zap, Play } from "lucide-react";
+import { Download, X, Zap} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProgressBar from "./ProgressBar";
 import { toast } from "sonner";
 import { getDownloadUrl } from "../data/mockMovies";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { useAdContext } from "@/contexts/AdContext";
 import FullScreenAdModal from "@/components/ads/FullScreenAdModal";
 
@@ -22,7 +22,7 @@ const DownloadSection = ({ externalUrl, movieId, title }: DownloadSectionProps) 
   const [progress, setProgress] = useState(0);
   const [downloadComplete, setDownloadComplete] = useState(false);
   const [buttonAdCount, setButtonAdCount] = useState(0);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   
   const { 
     showFullScreenAd, 
@@ -97,15 +97,15 @@ const DownloadSection = ({ externalUrl, movieId, title }: DownloadSectionProps) 
     }
   };
 
-  const handleWatchNow = async () => {
-    // Show 1 ad for video
-    const adShown = await showFullScreenAd('video');
-    if (adShown) {
-      navigate(`/watch/${movieId}`);
-    } else {
-      toast.info("Please complete the ad to watch");
-    }
-  };
+  // const handleWatchNow = async () => {
+  //   // Show 1 ad for video
+  //   const adShown = await showFullScreenAd('video');
+  //   if (adShown) {
+  //     navigate(`/watch/${movieId}`);
+  //   } else {
+  //     toast.info("Please complete the ad to watch");
+  //   }
+  // };
 
   const handleAssistedDownload = async () => {
     // Show 3 ads for assisted download
@@ -204,7 +204,7 @@ const DownloadSection = ({ externalUrl, movieId, title }: DownloadSectionProps) 
             {isDownloading ? "Downloading..." : `Download Now (${3 - buttonAdCount} ads)`}
           </Button>
           
-          <Button 
+          {/* <Button 
             variant="secondary" 
             size="lg"
             className="flex-1 min-h-8 cursor-pointer"
@@ -213,7 +213,7 @@ const DownloadSection = ({ externalUrl, movieId, title }: DownloadSectionProps) 
           >
             <Play className="w-5 h-5 mr-2" />
             Watch Now (1 ad)
-          </Button>
+          </Button> */}
           
           <Button 
             variant="outline" 
