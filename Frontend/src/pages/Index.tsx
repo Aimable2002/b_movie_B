@@ -4,21 +4,18 @@ import MovieInfo from "../components/MovieInfo";
 import DownloadSection from "../components/DownloadSection";
 import AdBanner from "../components/AdBanner";
 import { Loader2, AlertCircle } from "lucide-react";
-import Watch from "./Watch";
+// import Watch from "./Watch";
 
 const Index = () => {
   const [movieData, setMovieData] = useState<Movie | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   useEffect(() => {
     const fetchMovieData = async () => {
       try {
         // Get the movie link from URL parameter
         const urlParams = new URLSearchParams(window.location.search);
-        console.log('url params :', urlParams)
         const movieLink = urlParams.get('link') || urlParams.get('externalUrl');
-        console.log('movie link :', movieLink)
 
         if (!movieLink) {
           setError("Movie link parameter is required");
@@ -26,10 +23,7 @@ const Index = () => {
           return;
         }
 
-        console.log("Fetching movie data for:", movieLink);
-
         const movie = await getMovieByExternalUrl(movieLink);
-        console.log('movie :', movie)
 
         if (!movie) {
           setError("Movie not found");
@@ -102,9 +96,9 @@ const Index = () => {
                 fileSize={movieData.fileSize}
               />
 
-              <Watch 
+              {/* <Watch 
                 url={movieData.streamUrl}
-              />
+              /> */}
               
               <DownloadSection 
                 downloadUrl={movieData.downloadUrl}

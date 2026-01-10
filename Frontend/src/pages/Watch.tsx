@@ -1,6 +1,6 @@
 // Watch.tsx
 import {  useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Loader2, AlertCircle, Play } from "lucide-react";
 import { useAdContext } from "@/contexts/AdContext";
 import FullScreenAdModal from "@/components/ads/FullScreenAdModal";
