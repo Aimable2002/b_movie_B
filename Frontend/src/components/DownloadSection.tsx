@@ -1,6 +1,6 @@
 // DownloadSection.tsx - Updated version
 import { useState, useEffect } from "react";
-import { Download, X, Zap, Play} from "lucide-react";
+import { Download, X, Zap} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProgressBar from "./ProgressBar";
 import { toast } from "sonner";
@@ -17,7 +17,7 @@ interface DownloadSectionProps {
   title?: string;
 }
 
-const DownloadSection = ({ externalUrl, movieId, title}: DownloadSectionProps) => {
+const DownloadSection = ({ movieId, title}: DownloadSectionProps) => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [downloadComplete, setDownloadComplete] = useState(false);
@@ -60,10 +60,11 @@ const DownloadSection = ({ externalUrl, movieId, title}: DownloadSectionProps) =
   const handleDownload = async () => {
     // Show 3 ads before download
     if (buttonAdCount < 3) {
-      const adShown = await showFullScreenAd('button');
+      // const adShown = await showFullScreenAd('button');
+      const adShown = true
       if (adShown) {
         setButtonAdCount(prev => prev + 1);
-        if (buttonAdCount + 1 === 3) {
+        if (buttonAdCount + 1 === 1) {
           // After 3 ads, start download
           startDownload();
         } else {
@@ -114,7 +115,7 @@ const DownloadSection = ({ externalUrl, movieId, title}: DownloadSectionProps) =
       const adShown = await showFullScreenAd('button');
       if (adShown) {
         setButtonAdCount(prev => prev + 1);
-        if (buttonAdCount + 1 === 3) {
+        if (buttonAdCount + 1 === 1) {
           window.open('https://wa.me/+250788484589', '_blank');
         } else {
           toast.info(`Watch ${3 - (buttonAdCount + 1)} more ads for assistance`);
@@ -134,18 +135,20 @@ const DownloadSection = ({ externalUrl, movieId, title}: DownloadSectionProps) =
 
   const handleOpenExternal = async () => {
     // Show 3 ads for external link
-    if (buttonAdCount < 3) {
-      const adShown = await showFullScreenAd('button');
+    // if (buttonAdCount < 3) {
+      if (buttonAdCount === 1) {
+      // const adShown = await showFullScreenAd('button');
+      const adShown = true
       if (adShown) {
         setButtonAdCount(prev => prev + 1);
-        if (buttonAdCount + 1 === 3) {
-          window.open(externalUrl, '_blank');
+        if (buttonAdCount + 1 === 1) {
+          window.open('https://whatsapp.com/channel/0029VatSPGuBA1esh1H2Sx1U', '_blank');
         } else {
           toast.info(`Watch ${3 - (buttonAdCount + 1)} more ads to open`);
         }
       }
     } else {
-      window.open(externalUrl, '_blank');
+      window.open('https://whatsapp.com/channel/0029VatSPGuBA1esh1H2Sx1U', '_blank');
     }
   };
 
@@ -252,7 +255,8 @@ const DownloadSection = ({ externalUrl, movieId, title}: DownloadSectionProps) =
               onClick={handleOpenExternal}
               disabled={isShowingAd}
             >
-              Open Original ({3 - buttonAdCount} ads)
+              {/* Open Original ({3 - buttonAdCount} ads) */}
+              WhatsApp Channel
             </Button>
           </div>
           

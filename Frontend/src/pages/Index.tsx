@@ -4,7 +4,7 @@ import MovieInfo from "../components/MovieInfo";
 import DownloadSection from "../components/DownloadSection";
 import AdBanner from "../components/AdBanner";
 import { Loader2, AlertCircle } from "lucide-react";
-// import Watch from "./Watch";
+import Watch from "./Watch";
 
 const Index = () => {
   const [movieData, setMovieData] = useState<Movie | null>(null);
@@ -96,9 +96,9 @@ const Index = () => {
                 fileSize={movieData.fileSize}
               />
 
-              {/* <Watch 
+              <Watch 
                 url={movieData.streamUrl}
-              /> */}
+              />
               
               <DownloadSection 
                 downloadUrl={movieData.downloadUrl}
@@ -123,10 +123,10 @@ const Index = () => {
           <div className="container mx-auto px-4 max-w-5xl">
             <div className="text-center space-y-3">
               <p className="text-sm text-muted-foreground">
-                © {new Date().getFullYear()} AgasobanuyeTimes.space Download Page. All rights reserved. Crafted by Reuble Group.
+                © {new Date().getFullYear()} RebaMovie.cc Download Page. All Rights reserved. Crafted by Reuble Group.
               </p>
               <p className="text-xs text-muted-foreground/60 max-w-lg mx-auto">
-                Files hosted externally. AgasobanuyeTimes.space only provides redirection. We do not host or store any files on our servers.
+                Files hosted externally. RebaMovie.cc only provides redirection. We do not host or store any files on our servers.
               </p>
             </div>
           </div>

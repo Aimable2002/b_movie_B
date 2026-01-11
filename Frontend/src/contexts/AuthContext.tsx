@@ -9,7 +9,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "https://agasobanuye-yrqs.onrender.com/api";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://b-movie-b.onrender.com/api";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
