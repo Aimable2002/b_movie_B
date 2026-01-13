@@ -169,7 +169,7 @@ const DownloadSection = ({ movieId, title}: DownloadSectionProps) => {
 
       <div className="glass-card rounded-2xl p-6 md:p-8 animate-fade-in-up">
         {/* Ad Counter Display */}
-        <div className="mb-4 p-3 bg-gray-900/50 rounded-lg">
+        {/* <div className="mb-4 p-3 bg-gray-900/50 rounded-lg">
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-400">Ads watched for buttons:</span>
             <span className="text-lg font-bold text-white">
@@ -187,7 +187,7 @@ const DownloadSection = ({ movieId, title}: DownloadSectionProps) => {
               Click any button to watch ads ({3 - buttonAdCount} more needed)
             </p>
           )}
-        </div>
+        </div> */}
 
         <ProgressBar 
           isAnimating={isDownloading} 
@@ -205,7 +205,7 @@ const DownloadSection = ({ movieId, title}: DownloadSectionProps) => {
             disabled={isDownloading || isShowingAd}
           >
             <Download className="w-5 h-5 mr-2" />
-            {isDownloading ? "Downloading..." : `Download Now (${3 - buttonAdCount} ads)`}
+            {isDownloading ? "Downloading..." : `Download Now `}   { /*(${3 - buttonAdCount} ads) */}
           </Button>
           
           {/* <Button 
@@ -233,32 +233,31 @@ const DownloadSection = ({ movieId, title}: DownloadSectionProps) => {
 
         {/* Alternative Options */}
         <div className="glass-card-subtle rounded-xl p-4">
-          <p className="text-sm text-muted-foreground mb-3">
+          {/* <p className="text-sm text-muted-foreground mb-3">
             Alternative options (3 ads required for each):
-          </p>
+          </p> */}
           
           <div className="flex flex-wrap gap-3">
-            <Button 
-              variant="default" 
+            {/* WhatsApp Channel */}
+            <Button
+              variant="default"
               size="sm"
-              className="bg-primary hover:bg-primary/90"
+              className="bg-[#25D366] hover:bg-[#1ebe5d] text-white"
               onClick={handleAssistedDownload}
-              disabled={isShowingAd}
             >
-              <Zap className="w-4 h-4 mr-2" />
-              Assisted Download ({3 - buttonAdCount} ads)
+              📢 WhatsApp Channel
             </Button>
-            
-            <Button 
-              variant="outline" 
+
+            {/* WhatsApp Contact */}
+            <Button
+              variant="outline"
               size="sm"
-              onClick={handleOpenExternal}
-              disabled={isShowingAd}
-            >
-              {/* Open Original ({3 - buttonAdCount} ads) */}
-              WhatsApp Channel
+              className="border-[#25D366] text-[#25D366] hover:bg-[#25D366]/10"
+              onClick={handleOpenExternal}>
+              💬 WhatsApp Contact
             </Button>
           </div>
+
           
           <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
             <p className="text-xs text-amber-600 font-medium">

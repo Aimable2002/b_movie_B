@@ -123,7 +123,7 @@ const Index = () => {
           <div className="container mx-auto px-4 max-w-5xl">
             <div className="text-center space-y-3">
               <p className="text-sm text-muted-foreground">
-                © {new Date().getFullYear()} RebaMovie.cc Download Page. All Rights reserved. Crafted by Reuble Group.
+                © {new Date().getFullYear()} RebaMovie.cc Download Page. All Rights Reserved. Crafted by Reuble Group.
               </p>
               <p className="text-xs text-muted-foreground/60 max-w-lg mx-auto">
                 Files hosted externally. RebaMovie.cc only provides redirection. We do not host or store any files on our servers.
