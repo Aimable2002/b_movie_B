@@ -17,7 +17,7 @@ interface DownloadSectionProps {
   title?: string;
 }
 
-const DownloadSection = ({ movieId, title}: DownloadSectionProps) => {
+const DownloadSection = ({ movieId, title, downloadUrl}: DownloadSectionProps) => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [downloadComplete, setDownloadComplete] = useState(false);
@@ -80,9 +80,13 @@ const DownloadSection = ({ movieId, title}: DownloadSectionProps) => {
     setIsDownloading(true);
     setProgress(0);
     setDownloadComplete(false);
-    
+    let url
     try {
-      const url = await getDownloadUrl(movieId);
+      if(downloadUrl){
+        url = downloadUrl
+      }else {
+        url = await getDownloadUrl(movieId);
+      }
       if (url) {
         const link = document.createElement('a');
         link.href = url;
@@ -94,7 +98,7 @@ const DownloadSection = ({ movieId, title}: DownloadSectionProps) => {
         toast.info("Download started!");
       }
     } catch (error) {
-      console.error("Error getting download URL:", error);
+      // console.error("Error getting download URL:", error);
       toast.error("Failed to get download URL");
     }
   };
@@ -245,7 +249,7 @@ const DownloadSection = ({ movieId, title}: DownloadSectionProps) => {
               className="bg-[#25D366] hover:bg-[#1ebe5d] text-white"
               onClick={handleAssistedDownload}
             >
-              📢 WhatsApp Channel
+              💬 WhatsApp Contact
             </Button>
 
             {/* WhatsApp Contact */}
@@ -254,7 +258,7 @@ const DownloadSection = ({ movieId, title}: DownloadSectionProps) => {
               size="sm"
               className="border-[#25D366] text-[#25D366] hover:bg-[#25D366]/10"
               onClick={handleOpenExternal}>
-              💬 WhatsApp Contact
+              📢 WhatsApp Channel
             </Button>
           </div>
 
