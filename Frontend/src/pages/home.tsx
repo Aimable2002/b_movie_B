@@ -4,9 +4,9 @@ import { getMovies, getSeries, type Movie, type Series } from '../data/mockMovie
 import PromoBannerCarousel from '../components/PromoBannerCarousel';
 import Footer from '../components/Footer';
 
-type ContentItem =
-  | (Movie & { contentType: 'Movie' })
-  | (Series & { contentType: 'Series' });
+// type ContentItem =
+//   | (Movie & { contentType: 'Movie' })
+//   | (Series & { contentType: 'Series' });
 
 const HomePage = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -48,10 +48,10 @@ const HomePage = () => {
   }, []);
 
   // Merge and filter by search
-  const allItems: ContentItem[] = [
-    ...movies.map((m) => ({ ...m, contentType: 'Movie' as const })),
-    ...series.map((s) => ({ ...s, contentType: 'Series' as const })),
-  ];
+//   const allItems: ContentItem[] = [
+//     ...movies.map((m) => ({ ...m, contentType: 'Movie' as const })),
+//     ...series.map((s) => ({ ...s, contentType: 'Series' as const })),
+//   ];
 
   const filteredMovies = movies.filter((m) =>
     m.title.toLowerCase().includes(searchQuery.toLowerCase())
